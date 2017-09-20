@@ -373,7 +373,7 @@ class Object(object):
     properties = \
         [ ObjectIdentifierProperty('objectIdentifier', ObjectIdentifier, optional=False)
         , ReadableProperty('objectName', CharacterString, optional=False)
-        , ReadableProperty('description', CharacterString)
+        , OptionalProperty('description', CharacterString)
         , OptionalProperty('profileName', CharacterString)
         , ReadableProperty('propertyList', ArrayOf(PropertyIdentifier))
         ]
