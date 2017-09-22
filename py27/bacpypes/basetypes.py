@@ -136,6 +136,7 @@ class ServicesSupported(BitString):
         , 'deleteObject':11
         , 'readProperty':12
       # , 'readPropertyConditional':13      # removed in version 1 revision 12
+        , 'readPropertyIndirect':X          # Most likely 30 need a confirmation
         , 'readPropertyMultiple':14
         , 'writeProperty':15
         , 'writePropertyMultiple':16
@@ -857,6 +858,7 @@ class ErrorCode(Enumerated):
         , 'dynamicCreationNotSupported':4
         , 'encryptionNotConfigured':96
         , 'encryptionRequired':97
+        , 'endOfPath':X  # Enum missing
         , 'fileAccessDenied':5
         , 'fileFull':128
         , 'inconsistentConfiguration':129
@@ -904,6 +906,7 @@ class ErrorCode(Enumerated):
         , 'outOfMemory':133
         , 'parameterOutOfRange':80
         , 'passwordFailure':26
+        , 'pathLeavesDevice':X+1     # Enum missing
         , 'propertyIsNotAList':22
         , 'propertyIsNotAnArray':50
         , 'readAccessDenied':27
@@ -1196,12 +1199,15 @@ class NetworkType(Enumerated):
         , 'mstp':2
         , 'ptp':3
         , 'lontalk':4
-        , 'bacnetIpv4':5
+        , 'bacnetIPv4':5
         , 'zigbee':6
         , 'virtual':7
-        , 'nonBacnet':8
+        , 'nonBacnet':8 # removed in version 1 revision 18
         , 'ipv6':9
         , 'serial':10
+        , 'bvrl':n  # most likely 11 but in the addenda it's marked "n"
+        , 'websockets':n # same as above
+        , 'dnsSd':n # again
         }
 
 class NLRejectReason(Enumerated):
@@ -1383,7 +1389,9 @@ class PropertyIdentifier(Enumerated):
         , 'description':28
         , 'descriptionOfHalt':29
         , 'deviceAddressBinding':30
+        , 'deviceGroup': n    # enum absent from the addenda 2016bj
         , 'deviceType':31
+        , 'directory':n    # enum absent from addenda 2016bj
         , 'directReading':156
         , 'distributionKeyRevision':328
         , 'doNotHide':329
@@ -2068,6 +2076,14 @@ class ConnectionPeer(Sequence):
         , Element('device', ObjectIdentifier, 2)
         ]
 
+class ConfirmedServiceRequest(Choice):
+        # Absent from the addendas 2012ai and 2016bj 
+        pass
+
+class ConfirmedServiceACK(Choice):
+        # Absent from the addendas 2012ai and 2016bj
+        pass
+
 class COVSubscription(Sequence):
     sequenceElements = \
         [ Element('recipient', RecipientProcess, 0)
@@ -2703,6 +2719,27 @@ class PropertyReference(Sequence):
         , Element('propertyArrayIndex', Unsigned, 1, True)
         ]
 
+class ReferenceObject(Sequence):
+    sequenceElements = \
+        [ Element('deviceIdentifier', ObjectIdentifier, 0)
+        , Element('objectIdentifier', ObjectIdentifier, 1)
+        ]
+
+class ReferenceProperty(Sequence):
+    sequenceElements = \
+        [ Element('deviceIdentifier', ObjectIdentifier, 0)
+        , Element('objectIdentifier', ObjectIdentifier, 1)
+        , Element('propertyIdentifier', PropertyIdentifier, 2)
+        , Element('propertyArrayIndex', Unsigned, 3)
+        ]
+
+class Reference(Choice):
+    choiceElements = \
+        [ Element('object', ReferenceObject)
+        , Element('property', ReferenceProperty, 2)
+        , Element('uri', CharacterString, 3)
+        ]
+
 class Scale(Choice):
     choiceElements = \
         [ Element('floatScale', Real)
@@ -2772,7 +2809,7 @@ class TransportPDUHeader(Sequence):
 
 class TransportPDUBody(Choice):
     choiceElements = \
-        [ Element('transportError', TransportError , 0)
+        [ Element('transportError', TransportError, 0)
         , Element('npdu', OctetString, 1)
         , Element('confirmedrequest', ConfirmedServiceRequest, 2)
         , Element('unconfirmedRequest', UnconfirmedServiceRequest, 3)
@@ -2787,6 +2824,20 @@ class TransportPDU(Sequence):
     sequenceElements = \
         [ Element('header', TransportPDUHeader, 0)
         , Element('body', TransportPDUBody, 1)
+        ]
+
+class UnconfirmedServiceRequest(Choice):
+        # absent from the 2012ai and 2016bj addendas
+        pass
+
+class UnconfirmedServiceACK(Choice):
+        # absent from the 2012ai and 2016bj addendas
+        pass
+
+class VMACEntry(Sequence):
+    sequenceElements = \
+        [ Element('virtualMacAddress', OctetString, 0)
+        , Element('nativeMacAddress', OctetString, 1)
         ]
 
 class VTSession(Sequence):

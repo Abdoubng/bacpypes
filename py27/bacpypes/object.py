@@ -22,26 +22,28 @@ from .basetypes import AccessCredentialDisable, AccessCredentialDisableReason, \
     AccessUserType, AccessZoneOccupancyState, AccumulatorRecord, Action, \
     ActionList, AddressBinding, AssignedAccessRights, AuthenticationFactor, \
     AuthenticationFactorFormat, AuthenticationPolicy, AuthenticationStatus, \
-    AuthorizationException, AuthorizationMode, BackupState, BDTEntry,  BinaryPV, \
-    COVSubscription, CalendarEntry,CertificateSigningParameters ,ChannelValue, \
-    ClientCOV, ConnectionPeer, ConnectionStatus, CredentialAuthenticationFactor, \
-    DailySchedule, DateRange, DateTime, Destination, DeviceObjectPropertyReference, \
-    DeviceObjectReference, DeviceStatus, DoorAlarmState, DoorSecuredStatus, DNSSDMode, \
-    DoorStatus, DoorValue,  EID, EngineeringUnits, EventNotificationSubscription, \
-    EventParameter, EventState, EventTransitionBits, EventType, FaultParameter, \
-    FaultType, FDTEntry ,FileAccessMethod, HostNPort, IPMode, LifeSafetyMode, \
-    LifeSafetyOperation, LifeSafetyState, LightingCommand, LightingInProgress, \
-    LightingTransition, LimitEnable, LockStatus, LogMultipleRecord, LogRecord, \
-    LogStatus, LoggingType, Maintenance, NameValue, NetworkNumberQuality, \
-    NetworkPortCommand, NetworkSecurityPolicy, NetworkType, NodeType, NotifyType, \
-    ObjectPropertyReference, ObjectTypesSupported, OptionalCharacterString, Polarity, \
-    PortPermission, Prescale, PriorityArray, ProcessIdSelection, ProgramError, \
-    ProgramRequest, ProgramState, PropertyAccessResult, PropertyIdentifier, \
-    ProtocolLevel, Recipient, Reliability, RestartReason, RouterEntry, Reference, Scale, \
+    AuthorizationException, AuthorizationMode, BackupState, BinaryPV, \
+    COVSubscription, CalendarEntry, ChannelValue, ClientCOV, \
+    CredentialAuthenticationFactor, DailySchedule, DateRange, DateTime, \
+    Destination, DeviceObjectPropertyReference, DeviceObjectReference, \
+    DeviceStatus, DoorAlarmState, DoorSecuredStatus, DoorStatus, DoorValue, \
+    EngineeringUnits, EventNotificationSubscription, EventParameter, \
+    EventState, EventTransitionBits, EventType, FaultParameter, FaultType, \
+    FileAccessMethod, LifeSafetyMode, LifeSafetyOperation, LifeSafetyState, \
+    LightingCommand, LightingInProgress, LightingTransition, LimitEnable, \
+    LockStatus, LogMultipleRecord, LogRecord, LogStatus, LoggingType, \
+    Maintenance, NetworkSecurityPolicy, NodeType, NotifyType, \
+    ObjectPropertyReference, ObjectTypesSupported, OptionalCharacterString, \
+    Polarity, PortPermission, Prescale, PriorityArray, ProcessIdSelection, \
+    ProgramError, ProgramRequest, ProgramState, PropertyAccessResult, \
+    PropertyIdentifier, Recipient, Reliability, RestartReason, Scale, Reference, \
     SecurityKeySet, SecurityLevel, Segmentation, ServicesSupported, \
     SetpointReference, ShedLevel, ShedState, SilencedState, SpecialEvent, \
-    StatusFlags, TimeStamp, VMACEntry, VTClass, VTSession, WebSocketConnection, WriteStatus, \
-    
+    StatusFlags, TimeStamp, VTClass, VTSession, WriteStatus, NetworkType, \
+    NetworkPortCommand, NetworkNumberQuality, IPMode, HostNPort, BDTEntry, \
+    FDTEntry, VMACEntry, RouterEntry, EID, ProtocolLevel, ConnectionPeer, \
+    CertificateSigningParameters, NameValue, WebSocketConnection,ConnectionStatus, \
+    DNSSDMode
 from .apdu import EventNotificationParameters, ReadAccessSpecification, \
     ReadAccessResult
 
@@ -371,7 +373,7 @@ class Object(object):
     properties = \
         [ ObjectIdentifierProperty('objectIdentifier', ObjectIdentifier, optional=False)
         , ReadableProperty('objectName', CharacterString, optional=False)
-        , OptionalProperty('description', CharacterString)
+        , ReadableProperty('description', CharacterString)
         , OptionalProperty('profileName', CharacterString)
         , ReadableProperty('propertyList', ArrayOf(PropertyIdentifier))
         ]
@@ -1318,7 +1320,7 @@ class DeviceObject(Object):
         , ReadableProperty('apduTimeout', Unsigned)
         , ReadableProperty('numberOfApduRetries', Unsigned)
         , OptionalProperty('timeSynchronizationRecipients', SequenceOf(Recipient))
-        , OptionalProperty('maxMaster', Unsigned)
+        , OptionalProperty('maxMaster', Unsigned)  # Deprecated
         , OptionalProperty('maxInfoFrames', Unsigned)
         , ReadableProperty('deviceAddressBinding', SequenceOf(AddressBinding))
         , ReadableProperty('databaseRevision', Unsigned)
@@ -1331,10 +1333,10 @@ class DeviceObject(Object):
         , OptionalProperty('backupAndRestoreState', BackupState)
         , OptionalProperty('activeCovSubscriptions', SequenceOf(COVSubscription))
         , OptionalProperty('maxSegmentsAccepted', Unsigned)
-        , OptionalProperty('slaveProxyEnable', ArrayOf(Boolean))
-        , OptionalProperty('autoSlaveDiscovery', ArrayOf(Boolean))
-        , OptionalProperty('slaveAddressBinding', SequenceOf(AddressBinding))
-        , OptionalProperty('manualSlaveAddressBinding', SequenceOf(AddressBinding))
+        , OptionalProperty('slaveProxyEnable', ArrayOf(Boolean))  # Deprecated
+        , OptionalProperty('autoSlaveDiscovery', ArrayOf(Boolean)) # Deprecated
+        , OptionalProperty('slaveAddressBinding', SequenceOf(AddressBinding)) # Deprecated
+        , OptionalProperty('manualSlaveAddressBinding', SequenceOf(AddressBinding)) # Deprecated
         , OptionalProperty('lastRestartReason', RestartReason)
         , OptionalProperty('timeOfDeviceRestart', TimeStamp)
         , OptionalProperty('restartNotificationRecipients', SequenceOf(Recipient))
@@ -1871,6 +1873,229 @@ class OctetStringValueObject(Object):
         , OptionalProperty('priorityArray', PriorityArray)
         , OptionalProperty('relinquishDefault', OctetString)
         ]
+@register_object_type
+class PortObject(Object):
+    objectType = 'networkPort'
+    properties = \
+        [ ReadableProperty('statusFlags', StatusFlags)
+        , ReadableProperty('reliability', Reliability)
+        , ReadableProperty('outOfService', OutOfService)
+        , ReadableProperty('networkType', NetworkType)
+        , ReadableProperty('protocolLevel', ProtocolLevel) # not defined in the basetypes yet
+        , OptionalProperty('referencePort', Unsigned) 
+        , ReadableProperty('changesPending', Boolean) 
+        , OptionalProperty('Command', NetworkPortCommand)
+        , OptionalProperty('networkInterfaceName', CharacterString)
+        , OptionalProperty('eventDetectionEnable', Boolean)
+        , OptionalProperty('notificationClass', Unsigned)
+        , OptionalProperty('eventEnable', EventTransitionBits)
+        , OptionalProperty('ackedTranstions', EventTransitionBits)
+        , OptionalProperty('notifyType', NotifyType)
+        , OptionalProperty('eventTimeStamps', ArrayOf(TimeStamp))
+        , OptionalProperty('eventMessageTexts',ArrayOf(CharacterString))
+        , OptionalProperty('eventMessageTextsConfig',ArrayOf(CharacterString))
+        , OptionalProperty('eventState', EventState)
+        , OptionalProperty('reliabilityEvaluationInhibit', Boolean)
+        , ReadableProperty('propertyList', ArrayOf(PropertyIdentifier))
+        , OptionalProperty('tags', ArrayOf(NameValue)) # not defined in the basetypes yet
+        , OptionalProperty('profileLocation', CharacterString)
+        , OptionalProperty('profileName', CharacterString)
+        ]
+
+
+class NetworkPortObjectEthernet(PortObject):
+    properties = \
+        [ ReadableProperty('networkNumber', Unsigned)
+        , ReadableProperty('networkNumberQuality', NetworkNumberQuality)
+        , ReadableProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('linkSpeed', Real)
+        , OptionalProperty('linkSpeeds',ArrayOf(Real))
+        , OptionalProperty('linkSpeedAutonegotiate', Boolean)
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+
+class NetworkPortObjectARCNET(PortObject):
+    properties = \
+        [ ReadableProperty('networkNumber', Unsigned)
+        , ReadableProperty('networkNumberQuality', NetworkNumberQuality)
+        , ReadableProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('linkSpeed', Real)
+        , OptionalProperty('linkSpeeds',ArrayOf(Real))
+        , OptionalProperty('linkSpeedAutonegotiate', Boolean)
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+
+class NetworkPortObjectMSTP(PortObject):
+    properties = \
+        [ ReadableProperty('networkNumber', Unsigned)
+        , ReadableProperty('networkNumberQuality', NetworkNumberQuality)
+        , ReadableProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , OptionalProperty('maxMAster', Unsigned)
+        , OptionalProperty('maxInfoFrames', Unsigned)
+        , OptionalProperty('manualSlaveAddressBinding',SequenceOf(AddressBinding))
+        , OptionalProperty('autoSlaveDiscovery', Boolean)
+        , OptionalProperty('slaveAddressBinding', SequenceOf(AddressBinding))
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+
+class NetworkPortObjectLonTalk(PortObject):
+    properties = \
+        [ ReadableProperty('networkNumber', Unsigned)
+        , ReadableProperty('networkNumberQuality', NetworkNumberQuality)
+        , ReadableProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('linkSpeed', Real)
+        , OptionalProperty('linkSpeeds',ArrayOf(Real))
+        , OptionalProperty('linkSpeedAutonegotiate', Boolean)
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+
+class NetworkPortObjectZigbee(PortObject):
+    properties = \
+        [ ReadableProperty('networkNumber', Unsigned)
+        , ReadableProperty('networkNumberQuality', NetworkNumberQuality)
+        , ReadableProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('linkSpeed', Real)
+        , OptionalProperty('linkSpeeds',ArrayOf(Real))
+        , OptionalProperty('linkSpeedAutonegotiate', Boolean)
+        , ReadableProperty('virtualMacAddressTable', SequenceOf(VMACEntry)) # not defined in the basetypes yet
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+
+class NetworkPortObjectVirtual(PortObject):
+    properties = \
+        [ ReadableProperty('networkNumber', Unsigned)
+        , ReadableProperty('networkNumberQuality', NetworkNumberQuality)
+        , ReadableProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('linkSpeed', Real)
+        , OptionalProperty('linkSpeeds',ArrayOf(Real))
+        , OptionalProperty('linkSpeedAutonegotiate', Boolean)
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+
+class NetworkPortObjectPTP(PortObject):
+    properties = \
+        [ ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+
+class NetworkPortObjectIPv4(PortObject):
+    properties = \
+        [ ReadableProperty('networkNumber', Unsigned)
+        , ReadableProperty('networkNumberQuality', NetworkNumberQuality)
+        , ReadableProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('ipMode', IPMode)
+        , ReadableProperty('address', OctetString)
+        , ReadableProperty('ipUdpPort', Unsigned)
+        , ReadableProperty('subnetMask', OctetString)
+        , ReadableProperty('defaultGateway', OctetString)
+        , OptionalProperty('ipMulticastAddress', OctetString)
+        , ReadableProperty('dnsServer', ArrayOf(OctetString))
+        , OptionalProperty('ipDhcpEnable', Boolean)
+        , OptionalProperty('ipDhcpLeaseTime', Unsigned)
+        , OptionalProperty('ipDhcpLeaseTimeRemaining', Unsigned)
+        , OptionalProperty('ipDhcpServer', OctetString)
+        , OptionalProperty('ipNatTraversal', Boolean)
+        , OptionalProperty('ipGlobalAddress', HostNPort)
+        , OptionalProperty('bbmdBroadcastDistributionTable', SequenceOf(BDTEntry))
+        , OptionalProperty('bbmdAcceptFdRegistrations', Boolean)
+        , OptionalProperty('bbmdForeignDeviceTable', SequenceOf(FDTEntry))
+        , OptionalProperty('fdBbmdAddress', HostNPort)
+        , OptionalProperty('fdSubscriptionLifetime', Unsigned)
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+
+class NetworkPortObjectIPv6(PortObject):
+    properties = \
+        [ ReadableProperty('networkNumber', Unsigned)
+        , ReadableProperty('networkNumberQuality', NetworkNumberQuality)
+        , ReadableProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , OptionalProperty('bbmdBroadcastDistributionTable', SequenceOf(BDTEntry))
+        , OptionalProperty('bbmdAcceptFdRegistrations', Boolean)
+        , OptionalProperty('bbmdForeignDeviceTable', SequenceOf(FDTEntry))
+        , OptionalProperty('fdBbmdAddress', HostNPort)
+        , OptionalProperty('fdSubscriptionLifetime', Unsigned)
+        , ReadableProperty('ipv6Mode', IPMode)
+        , ReadableProperty('ipv6Address', OctetString)
+        , ReadableProperty('ipv6PrefixLength', Unsigned)
+        , ReadableProperty('ipv6UdpPort', Unsigned)
+        , ReadableProperty('ipv6defaultGateway', OctetString)
+        , OptionalProperty('ipv6MulticastAddress', OctetString)
+        , ReadableProperty('ipv6dnsServer', ArrayOf(OctetString))
+        , OptionalProperty('ipAutoAddressingEnable', Boolean)
+        , OptionalProperty('ipv6DhcpLeaseTime', Unsigned)
+        , OptionalProperty('ipv6DhcpLeaseTimeRemaining', Unsigned)
+        , OptionalProperty('ipv6DhcpServer', OctetString)
+        , OptionalProperty('ipv6ZoneIndex', CharacterString)
+        , OptionalProperty('virtualMacAddressTable',SequenceOf(VMACEntry)) # not defined in the basetypes yet
+        , ReadableProperty('routingTable',SequenceOf(RouterEntry))
+        ]
+
+class NetworkPortObjectBvrl(PortObject):
+    properties = \
+        [ ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('bvrlPeerDevice', ConnectionPeer)
+        , ReadableProperty('bvrlPeerUri', CharacterString)
+        , ReadableProperty('bvrlConnectionStatus', ConnectionStatus) 
+        , ReadableProperty('routingTable', SequenceOf(RouterEntry))
+        ]
+        
+class NetworkPortObjectWebsocket(PortObject):
+    properties = \
+        [ ReadableProperty('tpduLength', Unsigned)
+        , ReadableProperty('websocketOptions', SequenceOf(WebSocketOption))
+        , ReadableProperty('websocketEndpoint', OctetString)
+        , ReadableProperty('portCertificate', OctetString)
+        , OptionalProperty('defaultPortCertificate', OctetString)
+        , ReadableProperty('portPrivateKey', OctetString)
+        , OptionalProperty('defaultPortPrivateKey', OctetString)
+        , ReadableProperty('caCertificates', ArrayOf(OctetString))
+        , OptionalProperty('defaultCaCertificate', ArrayOf(OctetString))
+        , OptionalProperty('portCertificateToSign', OctetString)
+        , OptionalProperty('portCertificateSigningParameters', CertificateSigningParameters)
+        , ReadableProperty('connectionIdleTimeout', Unsigned)
+        , ReadableProperty('currentWebsockets',SequenceOf(WebSocketConnection))
+        ]
+
+class NetWorkPortOBjectDSNSD(PortObject):        
+    properties = \
+        [ ReadableProperty('dsnSdMode', DNSSDMode)
+        , OptionalProperty('browsingDomains', SequenceOf(CharacterString))
+        , ReadableProperty('defaultBrowsingDomain', CharacterString)
+        , OptionalProperty('mdnsMultiCastAddress', HostNPort)
+        , ReadableProperty('bdsDnsServers', SequenceOf(HostNPort))
+        ]
+
+class NetworkPortObjectSERIAL(PortObject):
+    properties = \
+        [ ReadableProperty('linkSpeed', Real)
+        , OptionalProperty('linkSpeeds', ArrayOf(Real))
+        , OptionalProperty('linkSpeedAutogenotiate', Boolean)
+        ]
+
+class NetworkPortObjectProprietary(PortObject):
+    properties = \
+        [ OptionalProperty('networkNumber', Unsigned)
+        , OptionalProperty('networkNumberQuality', NetworkNumberQuality)
+        , OptionalProperty('macAddress', OctetString)
+        , ReadableProperty('apduLength', Unsigned)
+        , ReadableProperty('routingTable', SequenceOf(RouterEntry))
+        ]
 
 @register_object_type
 class PositiveIntegerValueObject(Object):
@@ -2004,9 +2229,9 @@ class StructuredViewObject(Object):
         , ReadableProperty('subordinateList', ArrayOf(Reference))
         , OptionalProperty('subordinateAnnotations', ArrayOf(CharacterString))
         , OptionalProperty('interfaceName', CharacterString)
-        , OptionalProperty('referenceBy', SequenceOf(Reference))
+        , OptionalProperty('referencedBy', SequenceOf(Reference))
         , OptionalProperty('extendedSubordinateList', ArrayOf(Reference))
-        , OptionalProperty('extendedSubordinateAnnotation', ArrayOf(CharacterString))
+        , OptionalProperty('extendedSubordinateAnnotations', ArrayOf(CharacterString))
         , OptionalProperty('extendedInterfaceName', CharacterString)
         ]
 
