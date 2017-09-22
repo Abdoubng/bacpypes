@@ -11,7 +11,7 @@ from .primitivedata import BitString, Boolean, CharacterString, Date, Double, \
     Unsigned
 from .constructeddata import Any, AnyAtomic, ArrayOf, Choice, Element, \
     Sequence, SequenceOf
-
+from .apdu import Error
 # some debugging
 _debug = 0
 _log = ModuleLogger(globals())
@@ -39,14 +39,14 @@ class EventTransitionBits(BitString):
         , 'toNormal':2
         }
     bitLen = 3
-
+    
 class LimitEnable(BitString):
     bitNames = \
         { 'lowLimitEnable':0
         , 'highLimitEnable':1
         }
     bitLen = 2
-
+    
 class LogStatus(BitString):
     bitNames = \
         { 'logDisabled':0
@@ -107,8 +107,10 @@ class ObjectTypesSupported(BitString):
         , 'positiveIntegerValue':48
         , 'timePatternValue':49
         , 'timeValue':50
+        , 'lightingOutput':54
+        , 'networkPort':56
         }
-    bitLen = 51
+    bitLen = 53
 
 class ResultFlags(BitString):
     bitNames = \
@@ -403,6 +405,29 @@ class BinaryPV(Enumerated):
         , 'active':1
         }
 
+class ConnectionStatus(Enumerated):
+    enumerations = \
+        { 'unknown':0
+        , 'disabled':1
+        , 'initiating':2
+        , 'connecting':3
+        , 'connectionFailed':4
+        , 'eidResolution':5
+        , 'eidResolutionFailed':6
+        , 'connectedOutbound':7
+        , 'accepting':8
+        , 'connectedInbound':9
+        , 'disconnecting':10
+        , 'disconnected':11
+        }
+
+class DeviceProxyMode(Enumerated):
+    enumerations = \
+        { 'disabled':0
+        , 'manualConfiguration':1
+        , 'autoConfiguration':2
+        }
+
 class DeviceStatus(Enumerated):
     vendor_range = (64, 65535)
     enumerations = \
@@ -412,6 +437,51 @@ class DeviceStatus(Enumerated):
         , 'downloadInProgress':3
         , 'nonOperational':4
         , 'backupInProgress':5
+        }
+
+class DirectoryRecordQuality(Enumerated):
+    enumerations = \
+        { 'invalid':0
+        , 'unknown':1
+        , 'local':2
+        , 'configured':3
+        , 'registered':4
+        , 'learned':5
+        , 'monitored':6
+        }
+
+class DirectoryServerStatus(Enumerated):
+    enumerations = \
+        { 'unknown':0
+        , 'local':1
+        , 'primary':2
+        , 'secondary':3
+        , 'noServer':4
+        }
+
+class DirectoryScope(Enumerated):
+    enumerations = \
+        { 'local':0
+        , 'central':1
+        , 'central-secondary':2
+        }
+
+class DirectoryMode(Enumerated):
+    enumerations = \
+        { 'noBds':0
+        , 'noFallback':1
+        , 'fallBack':2
+        , 'bdsAlways':3
+        , 'both':4
+        }
+
+class DNSSDMode(Enumerated):
+    enumerations = \
+        { 'mdnsOnly':0
+        , 'stayOnDnsServer':1
+        , 'fallBack':2
+        , 'dnsServerOnly':3
+        , 'both':4
         }
 
 class DoorAlarmState(Enumerated):
@@ -716,6 +786,22 @@ class EngineeringUnits(Enumerated):
         , 'minutesPerDegreeKelvin':236
         }
 
+class EntityClass(Enumerated):
+    enumerations = \
+        { 'device':0
+        , 'proxiedDevice':1
+        , 'itDevice':2
+        , 'proxiedItDevice':3
+        , 'nlDevice':4
+        , 'proxiedNlDevice':5
+        , 'deviceGroup':6
+        , 'proxiedDeviceGroup':7
+        , 'itDeviceGroup':8
+        , 'proxiedItDeviceGroup':9
+        , 'nlDevicegroup':10
+        , 'proxiedNlDeviceGroup':11
+        }
+
 class ErrorClass(Enumerated):
     enumerations = \
         { 'device':0
@@ -789,6 +875,7 @@ class ErrorCode(Enumerated):
         , 'invalidParameterDataType':13
         , 'invalidTag':57
         , 'invalidTimeStamp':14
+        , 'invalidValueInThisState':138
         , 'keyUpdateInProgress':100
         , 'listElementNotFound':81
         , 'logBufferFull':75
@@ -914,6 +1001,24 @@ class FileAccessMethod(Enumerated):
         { 'recordAccess':0
         , 'streamAccess':1
         }
+    
+class ForwardingFault(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'none':0
+        , 'noTransport':1
+        , 'noResources':2
+        , 'networkAddressNotFound':3
+        , 'insufficientSecurity':4
+        , 'noConnection':5
+        }
+
+class IPMode(Sequence):
+    sequenceElements = \
+        [ Element('normal', 0)
+        , Element('foreign', 1)
+        , Element('bbmd', 2)
+        ]
 
 class LifeSafetyMode(Enumerated):
     enumerations = \
@@ -1035,6 +1140,81 @@ class Maintenance(Enumerated):
         , 'needServiceInoperative':3
         }
 
+class MembershipRegistration(Enumerated):
+    enumerations = \
+        { 'configured':0
+        , 'registred':1
+        , 'listen':2
+        }
+
+class MembershipStatus(Enumerated):
+    enumerations = \
+        { 'unknown':0
+        , 'invalid':1
+        , 'configured':2
+        , 'pending':3
+        , 'registered':4
+        , 'learned':5
+        , 'listening':6
+        , 'expired':7
+        }
+
+class NetworkNumberQuality(Enumerated):
+    enumerations = \
+        { 'unknown', 0
+        , 'learned', 1
+        , 'learnedConfigured', 2
+        , 'configured', 3
+        }
+
+class NetworkPortCommand(Enumerated):
+    vendor_range = (128, 255)
+    enumerations = \
+        { 'idle':0
+        , 'discardChanges':1
+        , 'renewFdRegistration':2
+        , 'restartSlaveDiscovery':3
+        , 'renewDHCP':4
+        , 'restartAutonegotiation':5
+        , 'disconnect':6
+        , 'restartPort':7
+        }
+
+class NetworkPriority(Enumerated):
+    enumerations = \
+        { 'normal':0
+        , 'urgent':1
+        , 'criticalEquipment':2
+        , 'lifeSafety':3
+        }
+
+class NetworkType(Enumerated):
+    vendor_range =(64, 255)
+    enumerations = \
+        { 'ethernet':0
+        , 'arcnet':1
+        , 'mstp':2
+        , 'ptp':3
+        , 'lontalk':4
+        , 'bacnetIpv4':5
+        , 'zigbee':6
+        , 'virtual':7
+        , 'nonBacnet':8
+        , 'ipv6':9
+        , 'serial':10
+        }
+
+class NLRejectReason(Enumerated):
+    enumerations = \
+        { 'other':0
+        , 'routerNotFound':1
+        , 'routerBusy':2
+        , 'unknownNlMessage':3
+        , 'messageTooLong':4
+        , 'securityError':5
+        , 'addressingError':6
+        }
+
 class NodeType(Enumerated):
     enumerations = \
         { 'unknown':0
@@ -1126,6 +1306,7 @@ class PropertyIdentifier(Enumerated):
         , 'all':8
         , 'allWritesSuccessful':9
         , 'allowGroupDelayInhibit':365
+        , 'apduLength': 399
         , 'apduSegmentTimeout':10
         , 'apduTimeout':11
         , 'applicationSoftwareVersion':12
@@ -1143,7 +1324,23 @@ class PropertyIdentifier(Enumerated):
         , 'backupAndRestoreState':338
         , 'backupFailureTimeout':153
         , 'backupPreparationTime':339
+        , 'bacnetIpAddress':400
+        , 'bacnetIpDefaultGateway':401
+        , 'bacnetIpDhcpEnable':402
+        , 'bacnetIpDhcpLeaseTime':403
+        , 'bacnetIpDhcpLeaseTimeRemaining':404
+        , 'bacnetIpDhcpServer':405
+        , 'bacnetIpDnsServer':406
+        , 'bacnetIpGlobalAddress':407
+        , 'bacnetIpMode':408
+        , 'bacnetIpMulticastAddress':409
+        , 'bacnetIpNatTraversal':410
+        , 'bacnetIpSubnetMask':411
+        , 'bacnetIpUdpPort':412
         , 'baseDeviceSecurityPolicy':327
+        , 'bbmdAcceptFdRegistrations':413
+        , 'bbmdBroadcastDistributionTable':414
+        , 'bbmdForeignDeviceTable':415
         , 'belongsTo':262
         , 'bias':14
         , 'bitMask':342
@@ -1152,8 +1349,10 @@ class PropertyIdentifier(Enumerated):
         , 'bufferSize':126
         , 'changeOfStateCount':15
         , 'changeOfStateTime':16
+        , 'changesPending':416
         , 'channelNumber':366
         , 'clientCovIncrement':127
+        , 'command':417
         , 'configurationFiles':154
         , 'controlGroups':367
         , 'controlledVariableReference':19
@@ -1225,6 +1424,8 @@ class PropertyIdentifier(Enumerated):
         , 'faultParameters':358
         , 'faultType':359
         , 'faultValues':39
+        , 'fdBbmdAddress':418
+        , 'fdSubscription':419
         , 'feedbackValue':40
         , 'fileAccessMethod':41
         , 'fileSize':42
@@ -1263,6 +1464,9 @@ class PropertyIdentifier(Enumerated):
         , 'lightingCommandDefaultPriority':381
         , 'limitEnable':52
         , 'limitMonitoringInterval':182
+        , 'linkSpeed':420
+        , 'linkSpeeds':421
+        , 'linkSpeedAutonegotiate':422
         , 'listOfGroupMembers':53
         , 'listOfObjectPropertyReferences':54
         , 'listOfSessionKeys':55
@@ -1280,6 +1484,7 @@ class PropertyIdentifier(Enumerated):
         , 'loggingRecord':184
         , 'loggingType':197
         , 'lowLimit':59
+        , 'macAddress':423
         , 'maintenanceRequired':158
         , 'manipulatedVariableReference':60
         , 'manualSlaveAddressBinding':170
@@ -1311,6 +1516,10 @@ class PropertyIdentifier(Enumerated):
         , 'musterPoint':287
         , 'negativeAccessRules':288
         , 'networkAccessSecurityPolicies':332
+        , 'networkInterfaceName':424
+        , 'networkNumber':425
+        , 'networkNumberQuality':426
+        , 'networkType':427
         , 'nodeSubtype':207
         , 'nodeType':208
         , 'notificationClass':17
@@ -1380,6 +1589,7 @@ class PropertyIdentifier(Enumerated):
         , 'restartNotificationRecipients':202
         , 'restoreCompletionTime':340
         , 'restorePreparationTime':341
+        , 'routingTable':428
         , 'scale':187
         , 'scaleFactor':188
         , 'scheduleDefault':174
@@ -1445,6 +1655,7 @@ class PropertyIdentifier(Enumerated):
         , 'vendorIdentifier':120
         , 'vendorName':121
         , 'verificationTime':326
+        , 'virtualMacAddressTable':429
         , 'vtClassesSupported':122
         , 'weeklySchedule':123
         , 'windowInterval':147
@@ -1471,6 +1682,14 @@ class Reliability(Enumerated):
         , 'configurationError':10
         , 'communicationFailure':12
         , 'numberFault':13
+        , 'monitoredObjectFault':14
+        , 'tripped':15
+        , 'activationFailure':17
+        , 'renewDhcpFailure':18
+        , 'renewFdRegistrationFailure':19
+        , 'restartAutoNegotiationFailure':20
+        , 'restartFailure':21
+        , 'propertyCommandFailure':22
         }
 
 class RestartReason(Enumerated):
@@ -1484,6 +1703,7 @@ class RestartReason(Enumerated):
         , 'hardwareWatchdog':5
         , 'softwareWatchdog':6
         , 'suspended':7
+        , 'activateChanges':8
         }
 
 class SecurityLevel(Enumerated):
@@ -1539,6 +1759,13 @@ class VTClass(Enumerated):
         , 'decVt220':4
         , 'hp-700-94':5
         , 'ibm-3130':6
+        }
+
+class WebSocketOption(Enumerated):
+    vendor_range = (256, 65535)
+    enumerations = \
+        { 'acceptInbound':0
+        , 'doOutbound':1
         }
 
 class WriteStatus(Enumerated):
@@ -1646,6 +1873,10 @@ class PropertyStates(Choice):
         , Element('lightingInProgress', LightingInProgress, 38)
         , Element('lightingOperation', LightingOperation, 39)
         , Element('lightingTransition', LightingTransition, 40)
+        , Element('bacnetIpMode', IpMode, 45)
+        , Element('networkPortCommand', NetworkPortCommand, 46)
+        , Element('networkType', NetworkType, 47)
+        , Element('networkNumberQuality', NumberQuality, 48)
         ]
 
 class PropertyValue(Sequence):
@@ -1692,6 +1923,12 @@ class WeekNDay(OctetString):
 #
 #   Sequences
 #
+
+class Abort(Sequence):
+    sequenceElements = \
+        [ Element('server', Boolean)
+        , Element('abortReason', AbortReason)
+        ]
 
 class AccessRule(Sequence):
     sequenceElements = \
@@ -1744,6 +1981,25 @@ class AssignedAccessRights(Sequence):
         , Element('enable', Boolean, 1)
         ]
 
+class AuthenticationDataUser(Sequence):
+    sequenceElements = \
+        [ Element('userIdentifier', Unsigned, 0)
+        , Element('userRole', Unsigned, 1)
+        ]
+
+class AuthenticationDataVendorSpecific(Sequence):
+    sequenceElements = \
+        [ Element('vendorIdentifier', Unsigned, 0)
+        , Element('authenticationMechanism', Unsigned, 1)
+        , Element('authenticationData', OctetString, 2)
+        ]
+
+class AuthenticationData(Choice):
+    choiceElements = \
+        [ Element('user', AuthenticationDataUser, 0)
+        , Element('vendorSpecific', AuthenticationDataVendorSpecific, 200)
+        ]
+
 class AuthenticationFactor(Sequence):
     sequenceElements = \
         [ Element('formatType', AuthenticationFactorType, 0)
@@ -1770,12 +2026,28 @@ class AuthenticationPolicy(Sequence):
         , Element('orderEnforced', Boolean, 1)
         , Element('timeout', Unsigned, 2)
         ]
+class BDTEntry(Sequence):
+    sequenceElements = \
+        [ Element('bbmdAddress', HostNPort, 0)
+        , Element('brodcastMask', OctetString, 1)
+        ]
 
 class CalendarEntry(Choice):
     choiceElements = \
         [ Element('date', Date, 0)
         , Element('dateRange', DateRange, 1)
         , Element('weekNDay', WeekNDay, 2)
+        ]
+
+class CertificateSigninParameters(Sequence):
+    sequenceElements = \
+        [ Element('commonName', CharacterString, 0)
+        , Element('countryName', CharacterString, 1)
+        , Element('stateOrProvinceName', CharacterString)
+        , Element('localityName', CharacterString, 3)
+        , Element('organizationName', CharacterString, 4)
+        , Element('emailAddress', CharacterString, 5)
+        , Element('alternativeNames', CharacterString, 6)
         ]
 
 class ChannelValue(Choice):
@@ -1787,6 +2059,13 @@ class ClientCOV(Choice):
     choiceElements = \
         [ Element('realIncrement', Real)
         , Element('defaultIncrement', Null)
+        ]
+
+class ConnectionPeer(Sequence):
+    sequenceElements = \
+        [ Element('accept', Null, 0)
+        , Element('url', CharacterString, 1)
+        , Element('device', ObjectIdentifier, 2)
         ]
 
 class COVSubscription(Sequence):
@@ -1820,6 +2099,14 @@ class Destination(Sequence):
         , Element('transitions', EventTransitionBits)
         ]
 
+class DeviceGroupMember(Sequence):
+    sequenceElements = \
+        [ Element('memeber', EID, 0)
+        , Element('timeToLive', Unsigned, 1)
+        , Element('status', MembershipStatus, 2)
+        , Element('fault', ForwardingFault, 3)
+        ]
+
 class DeviceObjectPropertyValue(Sequence):
     sequenceElements = \
         [ Element('deviceIdentifier', ObjectIdentifier, 0)
@@ -1827,6 +2114,23 @@ class DeviceObjectPropertyValue(Sequence):
         , Element('propertyIdentifier', PropertyIdentifier, 2)
         , Element('arrayIndex', Unsigned, 3, True)
         , Element('value', Any, 4)
+        ]
+
+class EID(Choice):
+    choiceElements = \
+        [ Element('notAssigned', Null, 0)
+        , Element('deviceIdentifier', Unsigned, 1)
+        , Element('deviceGroupIdentifier', Unsigned, 2)
+        ]
+
+class EntityRecord(Sequence):
+    sequenceElements = \
+        [ Element('identifier', EID, 0)
+        , Element('networkAddress', NetworkAddress, 1)
+        , Element('entityClass', EntityClass, 2)
+        , Element('priority', Unsigned, 3)
+        , Element('timeToLive', Unsigned, 4)
+        , Element('quality', DirectoryRecordQuality, 5)
         ]
 
 class EventNotificationSubscription(Sequence):
@@ -2049,6 +2353,26 @@ class FaultParameter(Choice):
         , Element('faultStatusFlags', FaultParameterStatusFlags, 5)
         ]
 
+class FDTEntry(Sequence):
+    sequenceElements = \
+        [ Element('bacnetipAddress', OctetString, 0)
+        , Element('timeToLive', Unsigned, 1)
+        , Element('remainingTimeToLive', Unsigned, 2)
+        ]
+
+class HostAddress(Choice):
+    sequenceElements = \
+        [ Element('non', Null, 0)
+        , Element('ipAddress', OctetString, 1) # 4 Octets
+        , Element('name', CharacterString, 2) # Internet host name
+        ]
+
+class HostNPort(Sequence):
+    sequenceElements = \
+        [ Element('host', HostAddress, 0)
+        , Element('port', Unsigned, 1)
+        ]
+
 class KeyIdentifier(Sequence):
     sequenceElements = \
         [ Element('algorithm', Unsigned, 0)
@@ -2113,10 +2437,22 @@ class LogRecord(Sequence):
         , Element('statusFlags', StatusFlags, 2, True)
         ]
 
+class NetworkAddress(Choice):
+    choiceElements = \
+        [ Element('none', Null, 0)
+        , Element('url', CharacterString, 1)
+        ]
+
 class NetworkSecurityPolicy(Sequence):
     sequenceElements = \
         [ Element('portId', Unsigned, 0)
         , Element('securityLevel', SecurityPolicy, 1)
+        ]
+
+class NLDeviceGroupAddress(Sequence):
+    sequenceElements = \
+        [ Element('address', Address, 0)
+        , Element('deviceGroup', EID, 1)
         ]
 
 class NotificationParametersChangeOfBitstring(Sequence):
@@ -2290,6 +2626,22 @@ class ObjectPropertyValue(Sequence):
         , Element('priority', Unsigned, 4, True)
         ]
 
+class ObjectRecord(Sequence):
+    sequenceElements = \
+        [ Element('device', EID, 0)
+        , Element('objectIdentifier', ObjectIdentifier, 1)
+        , Element('objectName', CharacterString, 2)
+        , Element('priority', Unsigned, 3)
+        , Element('timeToLive', Unsigned, 4)
+        , Element('quality', DirectoryRecordQuality, 5)
+        ]
+
+class OptionalAddress(Choice):
+    choiceElements = \
+        [ Element('null', Null)
+        , Element('address', Address)
+        ]
+
 class OptionalCharacterString(Choice):
     choiceElements = \
         [ Element('null', Null)
@@ -2365,6 +2717,13 @@ class SecurityKeySet(Sequence):
         , Element('keyIds', SequenceOf(KeyIdentifier), 3)
         ]
 
+class SecurityParameters(Sequence):
+    sequenceElements = \
+        [ Element('keyRevision', Unsigned, 0)
+        , Element('keyNumber', Unsigned, 1)
+        , Element('authentication', AuthenticationData, 2)
+        ]
+
 class ShedLevel(Choice):
     choiceElements = \
         [ Element('percent', Unsigned, 0)
@@ -2390,6 +2749,46 @@ class SpecialEvent(Sequence):
         , Element('eventPriority', Unsigned, 3)
         ]
 
+class TransportError(Sequence):
+    sequenceElements = \
+        [ Element('transportError', Error, 0)
+        , Element('sequenceNumber', Unsigned, 1)
+        , Element('nativeCode', Integer, 2)
+        , Element('errorText', CharacterString, 3)
+        ]
+
+class TransportPDUHeader(Sequence):
+    sequenceElements = \
+        [ Element('version', Unsigned, 0)
+        , Element('priority', NetworkPriority, 1)
+        , Element('sequenceNumber', Unsigned, 2)
+        , Element('sourceEid', EID, 3)
+        , Element('destinationEid', EID, 4)
+        , Element('originalDestinationEid', EID, 5) #Optional
+        , Element('invokeId', Unsigned, 6) #Optional
+        , Element('forwards', Unsigned, 7) #Optional
+        , Element('security', SecurityParameters, 8) #Optional
+        ]
+
+class TransportPDUBody(Choice):
+    choiceElements = \
+        [ Element('transportError', TransportError , 0)
+        , Element('npdu', OctetString, 1)
+        , Element('confirmedrequest', ConfirmedServiceRequest, 2)
+        , Element('unconfirmedRequest', UnconfirmedServiceRequest, 3)
+        , Element('complexAck', ConfirmedServiceAck, 4)
+        , Element('simpleAck', ConfirmedServiceChoice, 5)
+        , Element('error', Error, 6)
+        , Element('abort', Abort, 7)
+        , Element('reject', RejectReason, 8)
+        ]
+
+class TransportPDU(Sequence):
+    sequenceElements = \
+        [ Element('header', TransportPDUHeader, 0)
+        , Element('body', TransportPDUBody, 1)
+        ]
+
 class VTSession(Sequence):
     sequenceElements = \
         [ Element('localVtSessionID', Unsigned)
@@ -2397,3 +2796,9 @@ class VTSession(Sequence):
         , Element('remoteVtAddress', DeviceAddress)
         ]
 
+class WebSocketConnection(Sequence):
+    sequenceElements = \
+        [ Element('peer', CharacterString, 0)
+        , Element('endpoitIdentifier', OctetString, 1)
+        , Element('timeToLive', Unsigned, 2)
+        ]

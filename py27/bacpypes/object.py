@@ -22,24 +22,26 @@ from .basetypes import AccessCredentialDisable, AccessCredentialDisableReason, \
     AccessUserType, AccessZoneOccupancyState, AccumulatorRecord, Action, \
     ActionList, AddressBinding, AssignedAccessRights, AuthenticationFactor, \
     AuthenticationFactorFormat, AuthenticationPolicy, AuthenticationStatus, \
-    AuthorizationException, AuthorizationMode, BackupState, BinaryPV, \
-    COVSubscription, CalendarEntry, ChannelValue, ClientCOV, \
-    CredentialAuthenticationFactor, DailySchedule, DateRange, DateTime, \
-    Destination, DeviceObjectPropertyReference, DeviceObjectReference, \
-    DeviceStatus, DoorAlarmState, DoorSecuredStatus, DoorStatus, DoorValue, \
-    EngineeringUnits, EventNotificationSubscription, EventParameter, \
-    EventState, EventTransitionBits, EventType, FaultParameter, FaultType, \
-    FileAccessMethod, LifeSafetyMode, LifeSafetyOperation, LifeSafetyState, \
-    LightingCommand, LightingInProgress, LightingTransition, LimitEnable, \
-    LockStatus, LogMultipleRecord, LogRecord, LogStatus, LoggingType, \
-    Maintenance, NetworkSecurityPolicy, NodeType, NotifyType, \
-    ObjectPropertyReference, ObjectTypesSupported, OptionalCharacterString, \
-    Polarity, PortPermission, Prescale, PriorityArray, ProcessIdSelection, \
-    ProgramError, ProgramRequest, ProgramState, PropertyAccessResult, \
-    PropertyIdentifier, Recipient, Reliability, RestartReason, Scale, \
+    AuthorizationException, AuthorizationMode, BackupState, BDTEntry,  BinaryPV, \
+    COVSubscription, CalendarEntry,CertificateSigningParameters ,ChannelValue, \
+    ClientCOV, ConnectionPeer, ConnectionStatus, CredentialAuthenticationFactor, \
+    DailySchedule, DateRange, DateTime, Destination, DeviceObjectPropertyReference, \
+    DeviceObjectReference, DeviceStatus, DoorAlarmState, DoorSecuredStatus, DNSSDMode, \
+    DoorStatus, DoorValue,  EID, EngineeringUnits, EventNotificationSubscription, \
+    EventParameter, EventState, EventTransitionBits, EventType, FaultParameter, \
+    FaultType, FDTEntry ,FileAccessMethod, HostNPort, IPMode, LifeSafetyMode, \
+    LifeSafetyOperation, LifeSafetyState, LightingCommand, LightingInProgress, \
+    LightingTransition, LimitEnable, LockStatus, LogMultipleRecord, LogRecord, \
+    LogStatus, LoggingType, Maintenance, NameValue, NetworkNumberQuality, \
+    NetworkPortCommand, NetworkSecurityPolicy, NetworkType, NodeType, NotifyType, \
+    ObjectPropertyReference, ObjectTypesSupported, OptionalCharacterString, Polarity, \
+    PortPermission, Prescale, PriorityArray, ProcessIdSelection, ProgramError, \
+    ProgramRequest, ProgramState, PropertyAccessResult, PropertyIdentifier, \
+    ProtocolLevel, Recipient, Reliability, RestartReason, RouterEntry, Reference, Scale, \
     SecurityKeySet, SecurityLevel, Segmentation, ServicesSupported, \
     SetpointReference, ShedLevel, ShedState, SilencedState, SpecialEvent, \
-    StatusFlags, TimeStamp, VTClass, VTSession, WriteStatus
+    StatusFlags, TimeStamp, VMACEntry, VTClass, VTSession, WebSocketConnection, WriteStatus, \
+    
 from .apdu import EventNotificationParameters, ReadAccessSpecification, \
     ReadAccessResult
 
@@ -1999,8 +2001,13 @@ class StructuredViewObject(Object):
     properties = \
         [ ReadableProperty('nodeType', NodeType)
         , OptionalProperty('nodeSubtype', CharacterString)
-        , ReadableProperty('subordinateList', ArrayOf(DeviceObjectReference))
+        , ReadableProperty('subordinateList', ArrayOf(Reference))
         , OptionalProperty('subordinateAnnotations', ArrayOf(CharacterString))
+        , OptionalProperty('interfaceName', CharacterString)
+        , OptionalProperty('referenceBy', SequenceOf(Reference))
+        , OptionalProperty('extendedSubordinateList', ArrayOf(Reference))
+        , OptionalProperty('extendedSubordinateAnnotation', ArrayOf(CharacterString))
+        , OptionalProperty('extendedInterfaceName', CharacterString)
         ]
 
 @register_object_type

@@ -847,6 +847,35 @@ register_complex_ack_type(ReadPropertyACK)
 
 #-----
 
+class ReadPropertyIndirectRequest(ConfirmedRequestSequence):
+    serviceChoice = 13
+    sequenceElements = \
+        [ Element('objectIdentifier', ObjectIdentifier, 0)
+        , Element('propertyIdentifier', PropertyIdentifier, 1)
+        , Element('propertyArrayIndex', Unsigned, 2)
+        , Element('path', SequenceOf(Unsigned), 3)
+        ]
+
+register_confirmed_request_type(ReadPropertyIndirectRequest)
+
+class ReadPropertyIndirectACK(ComplexAckSequence):
+    serviceChoice = 13
+    sequenceElements = \
+        [ Element('objectIdentifier', ObjectIdentifier, 0)
+        , Element('propertyIdentifier', PropertyIdentifier, 1)
+        , Element('propertyArrayIndex', Unsigned, 2)
+        , Element('depthTraversed', Unsigned, 3)
+        , Element('referencedObjectIdentifier', ObjectIdentifier, 4)
+        , Element('referencedPropertyIdentifier', PropertyIdentifier, 5)
+        , Element('referencedArrayIndex', Unsigned, 6)
+        , Element('referencedListIndex', Unsigned, 7)
+        , Element('referencedPropertyValue', Any, 8)
+        , Element('errorType', Error, 9)
+        ]
+
+register_confirmed_request_type(ReadPropertyIndirectACK)
+
+#-----
 class ReadAccessSpecification(Sequence):
     sequenceElements = \
         [ Element('objectIdentifier', ObjectIdentifier, 0)
@@ -1557,6 +1586,7 @@ class ReinitializeDeviceRequestReinitializedStateOfDevice(Enumerated):
         , 'startrestore':4
         , 'endrestore':5
         , 'abortrestore':6
+        , 'activateChanges':7
         }
 
 class ReinitializeDeviceRequest(ConfirmedRequestSequence):
@@ -1668,6 +1698,7 @@ class ConfirmedServiceChoice(Enumerated):
         'createObject':10,
         'deleteObject':11,
         'readProperty':12,
+        'readPropertyIndirect':30,
         'readPropertyMultiple':14,
         'readRange':26,
         'writeProperty':15,
