@@ -373,7 +373,7 @@ class Object(object):
     properties = \
         [ ObjectIdentifierProperty('objectIdentifier', ObjectIdentifier, optional=False)
         , ReadableProperty('objectName', CharacterString, optional=False)
-        , ReadableProperty('description', CharacterString)
+        , OptionalProperty('description', CharacterString)
         , OptionalProperty('profileName', CharacterString)
         , ReadableProperty('propertyList', ArrayOf(PropertyIdentifier))
         ]
@@ -1345,6 +1345,30 @@ class DeviceObject(Object):
         , OptionalProperty('alignIntervals', Boolean)
         , OptionalProperty('intervalOffset', Unsigned)
         , OptionalProperty('serialNumber', CharacterString)
+        , OptionalProperty('activeCOVMultipleSubscriptions', SequenceOf(COVMultipleSubscriptions))
+        , OptionalProperty('entityClass', EntityClass)
+        , OptionalProperty('memberOf', SequenceOf(DeviceGroupMembership))
+        , OptionalProperty('totalASDULengthAccepted', Unsigned)
+        , OptionalProperty('deviceProxyMode', DeviceProxyMode)
+        , OptionalProperty('proxiedNLDeviceGroups', ArrayOf(NLDeviceGroupAddress))
+        , OptionalProperty('proxiedNLDevices',ArrayOf(EID))
+        ]
+
+@register_object_type
+class DeviceGroupObject(Object):
+    pass #TODO
+
+@register_object_type
+class ElevatorObject(Object):
+    objectType = 'elevator'
+    properties = \
+        [ ReadableProperty('machineRoomId', ObjectIdentifier)
+        , ReadableProperty('groupId', Unsigned)
+        , ReadableProperty('groupMembers', ArrayOf(ObjectIdentifier))
+        , OptionalProperty('groupMode', LiftGroupMode)
+        , OptionalProperty('landingCalls', SequenceOf(LandingCallStatus))
+        , OptionalProperty('landingCallControl', LandingCallStatus)
+        , OptionalProperty('profileName', CharacterString)
         ]
 
 @register_object_type
@@ -1371,6 +1395,40 @@ class EventEnrollmentObject(Object):
         , OptionalProperty('faultType', FaultType)
         , OptionalProperty('faultParameters', FaultParameter)
         , OptionalProperty('reliabilityEvaluationInhibit', Boolean)
+        ]
+
+@register_object_type
+class EscalatorObject(Object):
+    objectType = 'escalator'
+    properties = \
+        [ ReadableProperty('statusFlags', StatusFlags)
+        , ReadableProperty('elevatorGroup', ObjectIdentifier)
+        , ReadableProperty('groupId', Unsigned)
+        , ReadableProperty('installationId', Unsigned)
+        , OptionalProperty('powerMode', Boolean)
+        , ReadableProperty('operationDirection', EscalatorOperationDirection)
+        , OptionalProperty('energyMeter', Real)
+        , OptionalProperty('energyMeterRef', DeviceObjectReference)
+        , OptionalProperty('reliability', Reliability)
+        , ReadableProperty('outOfService', Boolean)
+        , OptionalProperty('faultSignals', SequenceOf(EscalatorFault))
+        , ReadableProperty('passengerPushbuttonAlarm', Boolean)
+        , OptionalProperty('timeDelay', Unsigned)
+        , OptionalProperty('timeDelayNorlam', Unsigned)
+        , OptionalProperty('eventDetectionEnable', Boolean)
+        , OptionalProperty('notificationClass', Unsigned)
+        , OptionalProperty('eventEnable', EventTransitionBits)
+        , OptionalProperty('eventState', EventState)
+        , OptionalProperty('ackedTransitions', EventTransitionBits)
+        , OptionalProperty('notifyType', NotifyType)
+        , OptionalProperty('eventTimeStamps', ArrayOf(TimeStamp))
+        , OptionalProperty('eventMessageTexts', ArrayOf(CharacterString))
+        , OptionalProperty('eventMessageTextsConfig', ArrayOf(CharacterString))
+        , OptionalProperty('eventAlgorithmInhibit', Boolean)
+        , OptionalProperty('eventAlgorithmInihibitRef', ObjectPropertyReference)
+        , OptionalProperty('relaiablityEvaluationInhibit', Boolean)
+        , ReadableProperty('propertyList', ArrayOf(PropertyIdentifier))
+        , OptionalProperty('profileName', CharacterString)
         ]
 
 #-----
@@ -1618,6 +1676,54 @@ class LifeSafetyZoneObject(Object):
         , OptionalProperty('maintenanceRequired', Boolean)
         , ReadableProperty('zoneMembers', SequenceOf(DeviceObjectReference))
         , OptionalProperty('memberOf', SequenceOf(DeviceObjectReference))
+        ]
+
+@register_object_type
+class LiftObject(Object):
+    objectType = 'lift'
+    properties = \
+        [ ReadableProperty('statusFlags', StatusFlags)
+        , ReadableProperty('elevatorgroup', ObjectIdentifier)
+        , ReadableProperty('groupId', Unsigned)
+        , ReadableProperty('installationId', Unsigned)
+        , OptionalProperty('assignedLandingCalls', ArrayOf(AssignedLandingCalls))
+        , OptionalProperty('makingCarCall', ArrayOf(Unsigned))
+        , OptionalProperty('registerCarCall', ArrayOf(LiftCarCallList))
+        , ReadableProperty('carPosition', Unsigned)
+        , ReadableProperty('carMovingDirection', LiftCarDirection)
+        , OptionalProperty('carAssignedDirection', LiftCarDirection)
+        , ReadableProperty('carDoorStatus', ArrayOf(DoorStatus))
+        , OptionalProperty('carDoorCommand', ArrayOf(LiftCarDoorCommand))
+        , OptionalProperty('carDoorZone', Boolean)
+        , OptionalProperty('carMode', LiftCarMode)
+        , OptionalProperty('carLoad', Real)
+        , OptionalProperty('nextStoppingFloor', Unsigned)
+        , ReadableProperty('passengerPushbuttonAlarm', Boolean)
+        , OptionalProperty('timeDelay', Unsigned)
+        , OptionalProperty('timeDelayNormal', Unsigned)
+        , OptionalProperty('energyMeter', Real)
+        , OptionalProperty('energyMeterRef', DeviceObjectReference)
+        , OptionalProperty('reliability', Reliability)
+        , ReadableProperty('outOfService', Boolean)
+        , OptionalProperty('carDriveStatus', LiftCarDriveStatus)
+        , ReadableProperty('faultSignals', SequenceOf(LiftFault))
+        , OptionalProperty('landingDoorStatus', Sequence(LandingDoorStatus))
+        , OptionalProperty('higherDeck', ObjectIdentifier)
+        , OptionalProperty('lowerDeck', ObjectIdentifier)
+        , OptionalProperty('eventDetectionEnable', Boolean)
+        , OptionalProperty('notificationClass', Unsigned)
+        , OptionalProperty('eventEnable', EventTransitionBits)
+        , OptionalProperty('eventState', EventState)
+        , OptionalProperty('ackedTransitions', EventTransitionBits)
+        , OptionalProperty('notifyType', NotifyType)
+        , OptionalProperty('eventTimeStamps', ArrayOf(TimeStamp))
+        , OptionalProperty('eventMessageTexts', ArrayOf(CharacterString))
+        , OptionalProperty('eventMessageTextsConfig', ArrayOf(CharacterString))
+        , OptionalProperty('eventAlgorithmInhibitRef', ObjectPropertyReference)
+        , OptionalProperty('eventAlgorithmInhibit', Boolean)
+        , OptionalProperty('reliabilityEvaluationInhibit', Boolean)
+        , ReadableProperty('propertyList', ArrayOf(PropertyIdentifier))
+        , OptionalProperty('profileName', CharacterString)
         ]
 
 @register_object_type

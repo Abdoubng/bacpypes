@@ -852,7 +852,7 @@ class ReadPropertyIndirectRequest(ConfirmedRequestSequence):
     sequenceElements = \
         [ Element('objectIdentifier', ObjectIdentifier, 0)
         , Element('propertyIdentifier', PropertyIdentifier, 1)
-        , Element('propertyArrayIndex', Unsigned, 2)
+        , Element('propertyArrayIndex', Unsigned, 2, True)
         , Element('path', SequenceOf(Unsigned), 3)
         ]
 
@@ -863,14 +863,14 @@ class ReadPropertyIndirectACK(ComplexAckSequence):
     sequenceElements = \
         [ Element('objectIdentifier', ObjectIdentifier, 0)
         , Element('propertyIdentifier', PropertyIdentifier, 1)
-        , Element('propertyArrayIndex', Unsigned, 2)
+        , Element('propertyArrayIndex', Unsigned, 2, True)
         , Element('depthTraversed', Unsigned, 3)
         , Element('referencedObjectIdentifier', ObjectIdentifier, 4)
         , Element('referencedPropertyIdentifier', PropertyIdentifier, 5)
-        , Element('referencedArrayIndex', Unsigned, 6)
-        , Element('referencedListIndex', Unsigned, 7)
+        , Element('referencedArrayIndex', Unsigned, 6, True)
+        , Element('referencedListIndex', Unsigned, 7, True)
         , Element('referencedPropertyValue', Any, 8)
-        , Element('errorType', Error, 9)
+        , Element('errorType', Error, 9, True)
         ]
 
 register_confirmed_request_type(ReadPropertyIndirectACK)
@@ -1355,6 +1355,67 @@ class SubscribeCOVPropertyRequest(ConfirmedRequestSequence):
 register_confirmed_request_type(SubscribeCOVPropertyRequest)
 
 #-----
+class ListOfValues(Sequence):
+    sequenceElements = \
+        [ Element('propertyIdentifier', PropertyIdentifier, 0)
+        , Element('propertyArrayIndex', Unsigned, 1)
+        , Element('value', Any, 2)
+        , Element('timeOfChange', Time, 3)
+        ]
+
+class ListOfCOVNotifications(Sequence):
+    sequenceElements = \
+        [ Element('monitoredObject', ObjectIdentifier, 0)
+        , Element('listOfValues', SequenceOf(ListOfValues), 1)
+        ]
+
+class COVNotificationMultipleParameters(Sequence):
+    sequenceElements = \
+        [ Element('subscriberProcessIdentifier', Unsigned, 0)
+        , Element('initiatingDeviceIdentifier', ObjectIdentifier)
+        , Element('timeRemaining', Unsigned, 2)
+        , Element('timeStamp', DateTime)
+        , Element('listOfCOVNotifications', SequenceOf(ListOfCOVNotifications))
+        ]
+
+class ConfirmedCOVNotificationMultipleRequest(ConfirmedRequestSequence):
+    serviceChoice = n # enum missing
+    sequenceElements = COVNotificationMultipleParameters.sequenceElements
+        
+register_confirmed_request_type(ConfirmedCOVNotificationMultipleRequest)
+
+class UnconfirmedCOVnotificationMultipleRequest(UnconfirmedRequestSequence):
+    serviceChoice = n # enum missing
+    sequenceElements = COVNotificationMultipleParameters.sequenceElements
+    
+register_confirmed_request_type(UnconfirmedCOVNotificationMultipleRequest)
+
+#-----
+
+class ListOfCOVReferences(Sequence):
+    sequenceElements = \
+        [ Element('monitoredProperty', PropertyReference, 0)
+        , Element('covIncrement', Real, 1)
+        , Element('timeStamped', Boolean, 2)
+        ]
+
+class ListOfCOVSubscriptionSpecifications(Sequence):
+    sequenceElements = \
+        [ Element('monitoredObject', ObjectIdentifier, 0)
+        , Element('listOfCOVReferences', ListOfCOVReferences, 1)
+        ]
+
+class SubscribeCOVPropertyMultipleRequest(ConfirmedRequestSequence):
+    serviceChoice = n # enum missing
+    sequenceElements = \
+        [ Element('subscriberProcessIdentifier', Unsigned, 0)
+        , Element('issueConfirmedNotifications', Boolean, 1)
+        , Element('lifetime', Unsigned, 2)
+        , Element(' maxNotificationDelay', Unsigned, 3)
+        , Element('listOfCOVSubscriptionSpecifications', ListOfCOVSubscriptionSpecifications, 4)
+        ]
+register_confirmed_request_type(SubscribeCOVPropertyMultipleRequest)
+#-----
 
 class AtomicReadFileRequestAccessMethodChoiceStreamAccess(Sequence):
     sequenceElements = \
@@ -1577,6 +1638,47 @@ register_confirmed_request_type(ConfirmedTextMessageRequest)
 
 #-----
 
+class ConfirmedAuditNotificationRequest(ConfirmedRequestSequence):
+    serviceChoice = n # enum missing
+    sequenceElements = \
+        [ Element('notifications', SequenceOf(AuditNotification))
+        ]
+
+register_confirmed_request_type(ConfirmedAuditNotificationRequest)
+
+class UnconfirmedAuditNotificationRequest(UnconfirmedRequestSequence):
+    serviceChoice = n # enum missing
+    sequenceElements = \
+        [ Element('notifications', SequenceOf(AuditNotification))
+        ]
+
+register_confirmed_request_type(UnconfirmedAuditNotificationRequest)
+
+#-----
+
+class AuditLogQueryRequest(ConfirmedRequestSequence):
+    serviceChoice = n # enum missing
+    sequenceElements = \
+        [ Element('auditLog', ObjectIdentifier, 0)
+        , Element('queryParameters', AuditLogQueryParameters, 1)
+        , Element('startAtSequenceNumber', Unsigned, 2)
+        , Element('requestedCount', Unsigned, 3)
+        ]
+
+register_confirmed_request_type(AuditLogQueryRequest)
+
+class AuditLogQueryACK(ComplexAckSequence):
+    serviceChoice = n # enum missing
+    sequenceElements = \
+        [ Element('auditLog', ObjectIdentifier, 0)
+        , Element('records', SequenceOf(AuditLogRecordResult), 1)
+        , Element('noMoreItems', Boolean, 2)
+        ]
+
+register_complex_ack_type(AuditLogQueryACK)
+
+#-----
+
 class ReinitializeDeviceRequestReinitializedStateOfDevice(Enumerated):
     enumerations = \
         { 'coldstart':0
@@ -1687,6 +1789,9 @@ class ConfirmedServiceChoice(Enumerated):
         'subscribeCOV':5,
         'subscribeCOVProperty':28,
         'lifeSafetyOperation':27,
+        'subscribeCOVPropertyMultiple':n, # enum missing from the addenda
+        'confirmedCOVNotificationMultiple':n+1, # enum missing from the addenda
+        'confirmedAuditNotification':n, # enum missing from the addenda
 
     # File Access Services
         'atomicReadFile':6,
@@ -1698,11 +1803,12 @@ class ConfirmedServiceChoice(Enumerated):
         'createObject':10,
         'deleteObject':11,
         'readProperty':12,
-        'readPropertyIndirect':30,
+        'readPropertyIndirect':40, # Enum absent from the addenda
         'readPropertyMultiple':14,
         'readRange':26,
         'writeProperty':15,
         'writePropertyMultiple':16,
+        'auditLogQuery':n, # enum missing from the addenda
 
     # Remote Device Management Services
         'deviceCommunicationControl':17,
@@ -1731,6 +1837,7 @@ class UnconfirmedServiceChoice(Enumerated):
         'whoIs':8,
         'utcTimeSynchronization':9,
         'writeGroup':10,
+        'unconfirmedCOVNotificationMultiple':n, # Enum absent from the addenda
         }
 
 expand_enumerations(UnconfirmedServiceChoice)
