@@ -1356,7 +1356,64 @@ class DeviceObject(Object):
 
 @register_object_type
 class DeviceGroupObject(Object):
-    pass #TODO
+   objectType = 'deviceGroup'
+   properties = \
+        [ ReadableProperty('entityClass', EntityClass)
+        , ReadableProperty('eventState', EventState)
+        , ReadableProperty('statusFlags', StatusFlags)
+        , ReadableProperty('reliabiliry', Reliability)
+        , ReadableProperty('groupMonitor', SequenceOf(deviceGroupMember))
+        , ReadableProperty('memberOf', SequenceOf(DeviceGroupMembership))
+        , ReadableProperty('defaultForwards', Unsigned)
+        , ReadableProperty('transportBindings', SequenceOf(ObjectIdentifier))
+        , OptionalProperty('bacnetNLAddress', OptionalAddress)
+        , OptionalProperty('eventDetectionEnable', Boolean)
+        , OptionalProperty('notificationClass', Unsigned)
+        , OptionalProperty('eventEnable', EventTransitionBits)
+        , OptionalProperty('ackedTransitions', EventTransitionBits)
+        , OptionalProperty('notifyType', NotifyType)
+        , OptionalProperty('eventTimeStamps', ArrayOf(TimeStamp))
+        , OptionalProperty('eventMessageTexts', ArrayOf(CharacterString))
+        , OptionalProperty('eventMessageTextsConfig', ArrayOf(CharacterString))
+        , OptionalProperty('reliabilityEvaluationInhibit', Boolean)
+        , ReadableProperty('propertyList', ArrayOf(PropertyIdentifier))
+        , ReadableProperty('Tags', ArrayOf(NameValue))
+        , OptionalProperty('profileLocation', CharacterString)
+        , OptionalProperty('profileName', CharacterString)
+        ]
+
+@register_object_type
+class DirectoryObject(Object):
+    objectType = 'directory'
+    properties = \
+        [ ReadableProperty('eventState', EventType)
+        , ReadableProperty('statusFlags', StatusFlags)
+        , ReadableProperty('reliability', Reliability)
+        , ReadableProperty('directoryScope', DirectoryScope)
+        , ReadableProperty('primaryDirectoryServer', DeviceObjectReference)
+        , OptionalProperty('secondaryDirectoryServers', SequenceOf(DeviceObjectReference))
+        , ReadableProperty('directoryServerStatus', DirectoryServerStatus)
+        , ReadableProperty('entityList', SequenceOf(EntityRecord))
+        , ReadableProperty('objectList', SequenceOf(ObjectRecord))
+        , ReadableProperty('defaultTimeToLive', Unsigned)
+        , ReadableProperty('mode', DirectoryMode)
+        , OptionalProperty('alarmValues', SequenceOf(DirectoryServerStatus))
+        , OptionalProperty('eventDetectionEnable', Boolean)
+        , OptionalProperty('notificationClass', Unsigned)
+        , OptionalProperty('eventEnable', EventTransitionBits)
+        , OptionalProperty('ackedTransitions', EventTransitionBits)
+        , OptionalProperty('notifyType', NotifyType)
+        , OptionalProperty('eventTimeStamps', ArrayOf(TimeStamp))
+        , OptionalProperty('eventMessageTexts', ArrayOf(CharacterString))
+        , OptionalProperty('eventMessageTextConfig', ArrayOf(CharacterString))
+        , OptionalProperty('eventAlgorithmInhibitRef', ObjectPropertyReference)
+        , OptionalProperty('eventAlgorithmInhibit', Boolean)
+        , OptionalProperty('reliabilityEvaluationInhibit', Boolean)
+        , OptionalProperty('propertyList', ArrayOf(PropertyIdentifier))
+        , OptionalProperty('tags', ArrayOf(NameValue))
+        , OptionalProperty('profileLocation', CharacterString)
+        , OptionalProperty('profileName', CharacterString)
+        ]
 
 @register_object_type
 class ElevatorObject(Object):

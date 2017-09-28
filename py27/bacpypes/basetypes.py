@@ -134,8 +134,10 @@ class ObjectTypesSupported(BitString):
         , 'escalator':n # enum missing from the addenda
         , 'lift':n # enum missing from the addenda
         , 'networkPort':56
+        , 'deviceGroup':n # enum missing
+        , 'directory':n # enum missing
         }
-    bitLen = 55
+    bitLen = 57
 
 class PriorityFilter(BitString):
     bitNames = \
