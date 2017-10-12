@@ -129,15 +129,18 @@ class ObjectTypesSupported(BitString):
         , 'positiveIntegerValue':48
         , 'timePatternValue':49
         , 'timeValue':50
+        , 'notificationForwarder':51
+        , 'alertEnrollment':52
+        , 'channel':53
         , 'lightingOutput':54
-        , 'elevatorGroup':n # enum missing from the addenda
-        , 'escalator':n # enum missing from the addenda
-        , 'lift':n # enum missing from the addenda
+        , 'elevatorGroup':57 
+        , 'escalator':58 
+        , 'lift':59 
         , 'networkPort':56
         , 'deviceGroup':n # enum missing
         , 'directory':n # enum missing
         }
-    bitLen = 57
+    bitLen = 60
 
 class PriorityFilter(BitString):
     bitNames = \
@@ -372,6 +375,36 @@ class Action(Enumerated):
     enumerations = \
         { 'direct':0
         , 'reverse':1
+        }
+
+class AuditLevel(Enumerated):
+    vendor_range = (128, 255)
+    enumerations = \
+        { 'none':0
+        , 'auditAll':1
+        , 'auditConfig':2
+        , 'default':3
+        }
+
+class AuditOperation(Enumerated):
+    vendor_range = (32, 63)
+    enumerations = \
+        { 'read':0
+        , 'write':1
+        , 'create':2
+        , 'delete':3
+        , 'lifeSafety':4
+        , 'acknowledgeAlarm':5
+        , 'deviceDisableComm':6
+        , 'deviceEnableComm':7
+        , 'deviceReset':8
+        , 'deviceBackup':9
+        , 'deviceRestore':10
+        , 'subscription':11
+        , 'notification':12
+        , 'auditingFailure':13
+        , 'networkChanges':14
+        , 'general':15
         }
 
 class AuthenticationFactorType(Enumerated):
@@ -1082,6 +1115,17 @@ class EscalatorFault(Enumerated):
         , 'combPlateFault':8
         }
 
+class EscalatorMode(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'unknown':0
+        , 'stop':1
+        , 'up':2
+        , 'down':3
+        , 'inspection':4
+        , 'outOfService':5
+        }
+
 class EscalatorOperationDirection(Enumerated):
     vendor_range = (1024, 65535)
     enumerations = \
@@ -1523,7 +1567,7 @@ class PropertyIdentifier(Enumerated):
         , 'actionText':3
         , 'activationTime':254
         , 'activeAuthenticationPolicy':255
-        , 'activeCovMultipleSubscrptions': n #enum missing
+        , 'activeCovMultipleSubscrptions':481 
         , 'activeCovSubscriptions':152
         , 'activeText':4
         , 'activeVtSessions':5
@@ -1541,7 +1585,7 @@ class PropertyIdentifier(Enumerated):
         , 'applicationSoftwareVersion':12
         , 'archive':13
         , 'assignedAccessRights':256
-        , 'assignedLandingCalls':n # enum missing
+        , 'assignedLandingCalls':447
         , 'attemptedSamples':124
         , 'authenticationFactors':257
         , 'authenticationPolicyList':258
@@ -1584,15 +1628,17 @@ class PropertyIdentifier(Enumerated):
         , 'bvrlPeerDevice':n # Enum missing
         , 'bvrlPeerUri':n # Enum missing
         , 'caCertificates':n # Enum missing
-        , 'carAssignedDirection':n #enum missing
-        , 'carDoorCommand':n #enum missing
-        , 'carDoorStatus':n #enum missing
-        , 'carDoorZone':n #enum missing
-        , 'carDriveStatus':n #enum missing
-        , 'carLoad':n #enum missing
-        , 'carMode':n #enum missing
-        , 'carMovingDirection':n #enum missing
-        , 'carPosition':n #enum missing
+        , 'carAssignedDirection':448
+        , 'carDoorCommand':449
+        , 'carDoorStatus':450
+        , 'carDoorText':451
+        , 'carDoorZone':452
+        , 'carDriveStatus':453
+        , 'carLoad':454
+        , 'carLoadUnits':455
+        , 'carMode':456
+        , 'carMovingDirection':457
+        , 'carPosition':458
         , 'changeOfStateCount':15
         , 'changeOfStateTime':16
         , 'changesPending':416
@@ -1659,14 +1705,15 @@ class PropertyIdentifier(Enumerated):
         , 'egressActive':386
         , 'egressTime':377
         , 'elapsedActiveTime':33
-        , 'elevatorGroup':n #enum missing
-        , 'energyMeter':n #enum missing
-        , 'energyMeterRef':n #enum missing
+        , 'elevatorGroup':459
+        , 'energyMeter':460
+        , 'energyMeterRef':461
         , 'entityclass':n # Enum missing
         , 'entityList':n # Enum missing
         , 'entryPoints':268
         , 'enable':133
         , 'errorLimit':34
+        , 'escalatorMode':462
         , 'eventAlgorithmInhibit':354
         , 'eventAlgorithmInhibitRef':355
         , 'eventDetectionEnable':353
@@ -1687,7 +1734,7 @@ class PropertyIdentifier(Enumerated):
         , 'failedAttempts':273
         , 'failedAttemptsTime':274
         , 'faultParameters':358
-        , 'faultSignals':n #enum missing
+        , 'faultSignals':463
         , 'faultType':359
         , 'faultValues':39
         , 'fdBbmdAddress':418
@@ -1697,20 +1744,21 @@ class PropertyIdentifier(Enumerated):
         , 'fileSize':42
         , 'fileType':43
         , 'firmwareRevision':44
+        , 'floorText':464
         , 'fullDutyBaseline':215
         , 'globalIdentifier':323
-        , 'groupId':n #enum missing
+        , 'groupId':465
         , 'groupMembers':345
         , 'groupMemberNames':346
-        , 'groupMode':n #enum missing
+        , 'groupMode':467
         , 'highLimit':45
-        , 'higherDeck':n #enum missing
+        , 'higherDeck':468
         , 'inDirectory':n # Enum missing
         , 'inactiveText':46
         , 'inProcess':47
         , 'inProgress':378
         , 'inputReference':181
-        , 'installationId':n #enum missing
+        , 'installationId':469
         , 'instanceOf':48
         , 'instantaneousPower':379
         , 'integralConstant':49
@@ -1718,9 +1766,9 @@ class PropertyIdentifier(Enumerated):
         , 'intervalOffset':195
         , 'isUtc':344
         , 'keySets':330
-        , 'landingCalls':n #enum missing
-        , 'landingCallControl':n #enum missing
-        , 'landingDoorStatus':n #enum missing
+        , 'landingCalls':470
+        , 'landingCallControl':471
+        , 'landingDoorStatus':472
         , 'lastAccessEvent':275
         , 'lastAccessPoint':276
         , 'lastCredentialAdded':277
@@ -1758,11 +1806,11 @@ class PropertyIdentifier(Enumerated):
         , 'loggingRecord':184
         , 'loggingType':197
         , 'lowLimit':59
-        , 'lowerDeck':n #enum missing
-        , 'machineRoomId':n #enum missing
+        , 'lowerDeck':473
+        , 'machineRoomId':474
         , 'macAddress':423
         , 'maintenanceRequired':158
-        , 'makingCarCall':n #enum missing
+        , 'makingCarCall':475
         , 'manipulatedVariableReference':60
         , 'manualSlaveAddressBinding':170
         , 'maskedAlarmValues':234
@@ -1794,7 +1842,7 @@ class PropertyIdentifier(Enumerated):
         , 'musterPoint':287
         , 'negativeAccessRules':288
         , 'networkAccessSecurityPolicies':332
-        , 'nextStoppingFloor':n #enum missing
+        , 'nextStoppingFloor':476
         , 'networkInterfaceName':424
         , 'networkNumber':425
         , 'networkNumberQuality':426
@@ -1821,7 +1869,7 @@ class PropertyIdentifier(Enumerated):
         , 'occupancyState':296
         , 'occupancyUpperLimit':297
         , 'occupancyUpperLimitEnforced':298
-        , 'operationDirection':n #enum missing
+        , 'operationDirection':477
         , 'operationExpected':161
         , 'optional':80
         , 'outOfService':81
@@ -1830,6 +1878,7 @@ class PropertyIdentifier(Enumerated):
         , 'passbackExemption':299
         , 'passbackMode':300
         , 'passbackTimeout':301
+        , 'passengerAlarm':478
         , 'passengerPushbuttonAlarm':n #enum missing
         , 'polarity':84
         , 'portCertificate':n # Enum missing
@@ -1839,7 +1888,7 @@ class PropertyIdentifier(Enumerated):
         , 'portFilter':363
         , 'positiveAccessRules':302
         , 'power':384
-        , 'powerMode':n #enum missing
+        , 'powerMode':479
         , 'prescale':185
         , 'presentValue':85
         , 'priority':86
@@ -1867,7 +1916,7 @@ class PropertyIdentifier(Enumerated):
         , 'recipientList':102
         , 'recordsSinceNotification':140
         , 'recordCount':141
-        , 'registeredCarCall':n #enum missing
+        , 'registeredCarCall':480
         , 'reliability':103
         , 'reliabilityEvaluationInhibit':357
         , 'relinquishDefault':104
@@ -2009,7 +2058,7 @@ class Reliability(Enumerated):
         , 'numberFault':13
         , 'monitoredObjectFault':14
         , 'tripped':15
-        , 'faultsListed':n #enum missing
+        , 'faultsListed':23
         , 'activationFailure':17
         , 'renewDhcpFailure':18
         , 'renewFdRegistrationFailure':19
@@ -2206,18 +2255,19 @@ class PropertyStates(Choice):
         , Element('lightingInProgress', LightingInProgress, 38)
         , Element('lightingOperation', LightingOperation, 39)
         , Element('lightingTransition', LightingTransition, 40)
-        , Element('escalatorOperationDirection', EscalatorOperationDirection, n) #enum missing
-        , Element('escalatorFault', EscalatorFault, n) #enum missing
-        , Element('liftCarDirection', LiftCarDirection, n) #enum missing
-        , Element('liftCarDoorCommand', LiftCarDoorCommand, n) #enum missing
-        , Element('liftCarDrivestatus', LiftCarDriveStatus, n) #enum missing
-        , Element('liftCarMode', LiftCarMode, n) #enum missing
-        , Element('liftGroupMode', LiftGroupMode, n) #enum missing
-        , Element('liftFault', LiftFault, n) #enum missing
         , Element('bacnetIpMode', IpMode, 45)
         , Element('networkPortCommand', NetworkPortCommand, 46)
         , Element('networkType', NetworkType, 47)
         , Element('networkNumberQuality', NumberQuality, 48)
+        , Element('escalatorOperationDirection', EscalatorOperationDirection, 49)
+        , Element('escalatorFault', EscalatorFault, 50)
+        , Element('escalatorMode', EscalatorMode, 51) 
+        , Element('liftCarDirection', LiftCarDirection, 52)
+        , Element('liftCarDoorCommand', LiftCarDoorCommand, 53)
+        , Element('liftCarDrivestatus', LiftCarDriveStatus, 54)
+        , Element('liftCarMode', LiftCarMode, 55)
+        , Element('liftGroupMode', LiftGroupMode, 56)
+        , Element('liftFault', LiftFault, 57)
         ]
 
 class PropertyValue(Sequence):
@@ -3298,7 +3348,7 @@ class TransportPDUBody(Choice):
         , Element('unconfirmedRequest', UnconfirmedServiceRequest, 3)
         , Element('complexAck', ConfirmedServiceAck, 4)
         , Element('simpleAck', ConfirmedServiceChoice, 5)
-        , Element('error', Error, 6)
+        , Element('error', ErrorPDU, 6)
         , Element('abort', Abort, 7)
         , Element('reject', RejectReason, 8)
         ]
