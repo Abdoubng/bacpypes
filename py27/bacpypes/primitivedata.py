@@ -1542,9 +1542,9 @@ class ObjectType(Enumerated):
         , 'datetimeValue':44
         , 'device':8
         , 'deviceGroup':n # Enum missing
-        , 'directpry':n # Enum missing
-        , 'elevatorGroup':n # enum missing
-        , 'escalator': n # enum missing
+        , 'directory':n # Enum missing
+        , 'elevatorGroup': 57
+        , 'escalator': 58 
         , 'eventEnrollment':9
         , 'eventLog':25
         , 'file':10
@@ -1554,7 +1554,7 @@ class ObjectType(Enumerated):
         , 'largeAnalogValue':46
         , 'lifeSafetyPoint':21
         , 'lifeSafetyZone':22
-        , 'lift':n # enum missing
+        , 'lift':59 # enum missing
         , 'loadControl':28
         , 'loop':12
         , 'multiStateInput':13
