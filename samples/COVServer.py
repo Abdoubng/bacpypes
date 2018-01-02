@@ -16,7 +16,7 @@ from bacpypes.app import BIPSimpleApplication
 from bacpypes.object import AnalogValueObject, BinaryValueObject
 from bacpypes.service.device import LocalDeviceObject
 from bacpypes.service.cov import ChangeOfValueServices
-
+import sys 
 # some debugging
 _debug = 0
 _log = ModuleLogger(globals())
@@ -227,8 +227,9 @@ def main():
         objectName='av',
         presentValue=0.0,
         statusFlags=[0, 0, 0, 0],
-        covIncrement=1.0,
+        covIncrement =1
         )
+
     _log.debug("    - test_av: %r", test_av)
 
     # add it to the device

@@ -16,7 +16,8 @@ from bacpypes.comm import bind
 
 from bacpypes.apdu import APDU, IAmRequest
 
-from bacpypes.app import LocalDeviceObject, Application
+from bacpypes.app import Application
+from bacpypes.service.device import LocalDeviceObject
 from bacpypes.appservice import ApplicationServiceAccessPoint, StateMachineAccessPoint
 
 from tests.state_machine import ServerStateMachine

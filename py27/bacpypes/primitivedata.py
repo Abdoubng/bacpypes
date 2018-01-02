@@ -1078,7 +1078,7 @@ class Enumerated(Atomic):
             # convert it to a string if you can
             self.value = self._xlate_table.get(arg, arg)
 
-        elif isinstance(arg, str):
+        elif isinstance(arg, basestring):
             if arg not in self._xlate_table:
                 raise ValueError("undefined enumeration '%s'" % (arg,))
             self.value = arg
@@ -1093,7 +1093,7 @@ class Enumerated(Atomic):
     def get_long(self):
         if isinstance(self.value, (int, long)):
             return self.value
-        elif isinstance(self.value, str):
+        elif isinstance(self.value, basestring):
             return long(self._xlate_table[self.value])
         else:
             raise TypeError("%s is an invalid enumeration value datatype" % (type(self.value),))
@@ -1137,7 +1137,7 @@ class Enumerated(Atomic):
             value = long(self.value)
         elif isinstance(self.value, long):
             value = self.value
-        elif isinstance(self.value, str):
+        elif isinstance(self.value, basestring):
             value = self._xlate_table[self.value]
         else:
             raise TypeError("%s is an invalid enumeration value datatype" % (type(self.value),))
@@ -1541,6 +1541,10 @@ class ObjectType(Enumerated):
         , 'datetimePatternValue':43
         , 'datetimeValue':44
         , 'device':8
+        , 'deviceGroup':n # Enum missing
+        , 'directory':n # Enum missing
+        , 'elevatorGroup': 57
+        , 'escalator': 58 
         , 'eventEnrollment':9
         , 'eventLog':25
         , 'file':10
@@ -1550,6 +1554,7 @@ class ObjectType(Enumerated):
         , 'largeAnalogValue':46
         , 'lifeSafetyPoint':21
         , 'lifeSafetyZone':22
+        , 'lift':59
         , 'loadControl':28
         , 'loop':12
         , 'multiStateInput':13
@@ -1613,7 +1618,7 @@ class ObjectIdentifier(Atomic):
             objType = self.objectTypeClass._xlate_table.get(objType, objType)
         elif isinstance(objType, long):
             objType = self.objectTypeClass._xlate_table.get(objType, int(objType))
-        elif isinstance(objType, str):
+        elif isinstance(objType, basestring):
             # make sure the type is known
             if objType not in self.objectTypeClass._xlate_table:
                 raise ValueError("unrecognized object type '%s'" % (objType,))
@@ -1635,7 +1640,7 @@ class ObjectIdentifier(Atomic):
             pass
         elif isinstance(objType, long):
             objType = int(objType)
-        elif isinstance(objType, str):
+        elif isinstance(objType, basestring):
             # turn it back into an integer
             objType = self.objectTypeClass()[objType]
         else:
@@ -1686,7 +1691,7 @@ class ObjectIdentifier(Atomic):
         # rip it apart
         objType, objInstance = self.value
 
-        if isinstance(objType, str):
+        if isinstance(objType, basestring):
             typestr = objType
         elif objType < 0:
             typestr = "Bad %d" % (objType,)

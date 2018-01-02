@@ -11,7 +11,7 @@ from .primitivedata import BitString, Boolean, CharacterString, Date, Double, \
     Unsigned
 from .constructeddata import Any, AnyAtomic, ArrayOf, Choice, Element, \
     Sequence, SequenceOf
-
+from .apdu import Error
 # some debugging
 _debug = 0
 _log = ModuleLogger(globals())
@@ -19,6 +19,28 @@ _log = ModuleLogger(globals())
 #
 #   Bit Strings
 #
+
+class AuditOperationFlags(BitString):
+    vendor_range = (32, 63)
+    bitNames = \
+        { 'read':0
+        , 'write':1
+        , 'create':2
+        , 'delete':3
+        , 'lifeSafety':4
+        , 'acknowledgeAlarm':5
+        , 'deviceDisableComm':6
+        , 'deviceEnableComm':7
+        , 'deviceReset':8
+        , 'deviceBackup':9
+        , 'deviceRestore':10
+        , 'subscription':11
+        , 'notification':12
+        , 'auditingFailure':13
+        , 'networkChanges':14
+        , 'general':15
+        }
+    bitLen = 16
 
 class DaysOfWeek(BitString):
     bitNames = \
@@ -107,8 +129,44 @@ class ObjectTypesSupported(BitString):
         , 'positiveIntegerValue':48
         , 'timePatternValue':49
         , 'timeValue':50
+<<<<<<< HEAD
         }
     bitLen = 51
+=======
+        , 'notificationForwarder':51
+        , 'alertEnrollment':52
+        , 'channel':53
+        , 'lightingOutput':54
+        , 'elevatorGroup':57 
+        , 'escalator':58 
+        , 'lift':59 
+        , 'networkPort':56
+        , 'deviceGroup':n # enum missing
+        , 'directory':n # enum missing
+        }
+    bitLen = 60
+
+class PriorityFilter(BitString):
+    bitNames = \
+        { 'manualLifeSafety':0
+        , 'automaticLifeSafety':1
+        , 'priority3':2
+        , 'priority4':3
+        , 'criticalEquipmentControls':4
+        , 'minimumOnOff':5
+        , 'priority7':6
+        , 'manualOperator':7
+        , 'priority9':8
+        , 'priority10':9
+        , 'priority11':10
+        , 'priority12':11
+        , 'priority13':12
+        , 'priority14':13
+        , 'priority15':14
+        , 'priority16':15
+        }
+    bitLen = 16
+>>>>>>> stage
 
 class ResultFlags(BitString):
     bitNames = \
@@ -134,6 +192,7 @@ class ServicesSupported(BitString):
         , 'deleteObject':11
         , 'readProperty':12
       # , 'readPropertyConditional':13      # removed in version 1 revision 12
+        , 'readPropertyIndirect':X          # Most likely 30 need a confirmation
         , 'readPropertyMultiple':14
         , 'writeProperty':15
         , 'writePropertyMultiple':16
@@ -161,6 +220,9 @@ class ServicesSupported(BitString):
         , 'subscribeCOVProperty':38
         , 'getEventInformation':39
         , 'writeGroup':40
+        , 'subscribeCOVPropertyMultiple':41
+        , 'confirmedCOVNotificationMultiple':42
+        , 'unconfirmedCOVNotificationMultiple':43
         }
     bitLen = 41
 
@@ -323,6 +385,36 @@ class Action(Enumerated):
         , 'reverse':1
         }
 
+class AuditLevel(Enumerated):
+    vendor_range = (128, 255)
+    enumerations = \
+        { 'none':0
+        , 'auditAll':1
+        , 'auditConfig':2
+        , 'default':3
+        }
+
+class AuditOperation(Enumerated):
+    vendor_range = (32, 63)
+    enumerations = \
+        { 'read':0
+        , 'write':1
+        , 'create':2
+        , 'delete':3
+        , 'lifeSafety':4
+        , 'acknowledgeAlarm':5
+        , 'deviceDisableComm':6
+        , 'deviceEnableComm':7
+        , 'deviceReset':8
+        , 'deviceBackup':9
+        , 'deviceRestore':10
+        , 'subscription':11
+        , 'notification':12
+        , 'auditingFailure':13
+        , 'networkChanges':14
+        , 'general':15
+        }
+
 class AuthenticationFactorType(Enumerated):
     enumerations = \
         { 'undefined':0
@@ -436,10 +528,18 @@ class DoorSecuredStatus(Enumerated):
         }
 
 class DoorStatus(Enumerated):
+    vendor_range = (1024, 65535)
     enumerations = \
         { 'closed':0
         , 'opened':1
         , 'unknown':2
+        , 'doorFault':3
+        , 'unused':4
+        , 'none':5
+        , 'closing':6
+        , 'opening':7
+        , 'safetyLocked':8
+        , 'limitedOpened':9
         }
 
 class DoorValue(Enumerated):
@@ -764,15 +864,35 @@ class ErrorCode(Enumerated):
         , 'deleteFdtEntryFailed':120
         , 'deviceBusy':3
         , 'destinationDeviceIdRequired':94
+        , 'destinationNotPresent':n # enum missing
         , 'distributeBroadcastFailed':121
+        , 'dnsNameResolutionFailed':n # Enum missing
+        , 'dnsOtherError':n # Enum missing
+        , 'dnsResolverFailure':n # Enum missing
+        , 'dnsUnavailable':n # Enum missing
         , 'duplicateMessage':95
         , 'duplicateName':48
         , 'duplicateObjectId':49
         , 'dynamicCreationNotSupported':4
         , 'encryptionNotConfigured':96
         , 'encryptionRequired':97
+        , 'endOfPath':n  # Enum missing
         , 'fileAccessDenied':5
         , 'fileFull':128
+        , 'httpNoUpgrade':n # Enum missing
+        , 'httpNotAServer':n # Enum missing
+        , 'httpOtherError':n # Enum missing
+        , 'httpProxyAuthenticationFailed':n # Enum missing
+        , 'httpResourceNotLocal':n # Enum missing
+        , 'httpResponseMissingHeader':n # Enum missing
+        , 'httpResponseSyntaxError':n # Enum missing
+        , 'httpResponseTimeout':n # Enum missing
+        , 'httpResponseValueError':n # Enum missing
+        , 'httpTemporaryUnavailable':n # Enum missing
+        , 'httpUnexpectedResponseCode':n # Enum missing
+        , 'httpUpgradeError':n # Enum missing
+        , 'httpUpgradeRequired':n # Enum missing
+        , 'httpWebsocketHeaderError':n # Enum missing
         , 'inconsistentConfiguration':129
         , 'inconsistentObjectType':130
         , 'inconsistentParameters':7
@@ -789,6 +909,12 @@ class ErrorCode(Enumerated):
         , 'invalidParameterDataType':13
         , 'invalidTag':57
         , 'invalidTimeStamp':14
+<<<<<<< HEAD
+=======
+        , 'invalidValueInThisState':138
+        , 'ipAddressNotReachable':n # Enum missing
+        , 'ipOtherError':n # Enum missing
+>>>>>>> stage
         , 'keyUpdateInProgress':100
         , 'listElementNotFound':81
         , 'logBufferFull':75
@@ -803,8 +929,10 @@ class ErrorCode(Enumerated):
         , 'noSpaceForObject':18
         , 'noSpaceToAddListElement':19
         , 'noSpaceToWriteProperty':20
+        , 'noTransportPortForProtocol':n # Enum missing
         , 'noVtSessionsAvailable':21
         , 'notConfigured':132
+        , 'notConfiguredForRegistration':n # Enum missing
         , 'notConfiguredForTriggeredLogging':78
         , 'notCovProperty':44
         , 'notKeyServer':102
@@ -817,6 +945,7 @@ class ErrorCode(Enumerated):
         , 'outOfMemory':133
         , 'parameterOutOfRange':80
         , 'passwordFailure':26
+        , 'pathLeavesDevice':X+1     # Enum missing
         , 'propertyIsNotAList':22
         , 'propertyIsNotAnArray':50
         , 'readAccessDenied':27
@@ -840,8 +969,27 @@ class ErrorCode(Enumerated):
         , 'serviceRequestDenied':29
         , 'sourceSecurityRequired':104
         , 'success':84
+        , 'tcpClosedByLocal':n # Enum missing
+        , 'tcpClosedOther':n # Enum missing
+        , 'tcpConnectTimeout':n # Enum missing
+        , 'tcpConnectionRefused':n # Enum missing
+        , 'tcpOtherError':n # Enum missing
         , 'timeout':30
+        , 'tlsClientAuthenticationFailed':n # Enum missing
+        , 'tlsClientCertificateRevoked':n # Enum missing
+        , 'tlsClientCertificateError':n # Enum missing
+        , 'tlsClientCertificateExpired':n # Enum missing
+        , 'tlsOtherError':n # Enum missing
+        , 'tlsServerAuthenticationFailed':n # Enum missing
+        , 'tlsServerCertificateRevoked':n # Enum missing
+        , 'tlsServerCertificateError':n # Enum missing
+        , 'tlsServerCertificateExpired':n # Enum missing
         , 'tooManyKeys':105
+        , 'tpduBodyNotSupported':n # Enum missing
+        , 'tpduHeaderError':n # Enum missing
+        , 'tpduNotForAGroup':n # Enum missing
+        , 'tpduTooLong':n # Enum missing
+        , 'tpduVersionNotSupported':n # Enum missing
         , 'unknownAuthenticationType':106
         , 'unknownDevice':70
         , 'unknownFileSize':122
@@ -861,8 +1009,58 @@ class ErrorCode(Enumerated):
         , 'valueTooLong':134
         , 'vtSessionAlreadyClosed':38
         , 'vtSessionTerminationFailure':39
+        , 'websocketCloseError':n # Enum missing
+        , 'websocketClosedAbnormaly':n # Enum missing
+        , 'websocketClosedByPeer':n # Enum missing
+        , 'websocketDataNotAccepted':n # Enum missing
+        , 'websocketEndpointLeaves':n # Enum missing
+        , 'websocketExtensionMissing':n # Enum missing
+        , 'websocketFrameTooLong':n # Enum missing
+        , 'websocketNotPresent':n # Enum missing
+        , 'websocketOtherError':n # Enum missing
+        , 'websocketProtocolError':n # Enum missing
+        , 'websocketRequestUnavailable':n # Enum missing
+        , 'websocketSecurityNotAvailable':n # Enum missing
+        , 'websocketSecurityRequired':n # Enum missing
+        , 'websocketSchemeNotSupported':n # Enum missing
+        , 'websocketUnknownControlMessage':n # Enum missing
         , 'writeAccessDenied':40
         , 'writeBdtFailed':116
+        }
+
+class EscalatorFault(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'controllerFault':0
+        , 'driveAndMotorFault':1
+        , 'mechanicalComponentFault':2
+        , 'overspeedFault':3
+        , 'powerSupplyFault':4
+        , 'safetyDeviceFault':5
+        , 'controllerSupplyFault':6
+        , 'driveTemperatureExceeded':7
+        , 'combPlateFault':8
+        }
+
+class EscalatorMode(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'unknown':0
+        , 'stop':1
+        , 'up':2
+        , 'down':3
+        , 'inspection':4
+        , 'outOfService':5
+        }
+
+class EscalatorOperationDirection(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'stopped':0
+        , 'upRatedSpeed':1
+        , 'upReducedSpeed':2
+        , 'downRatedSpeed':3
+        , 'downReducedSpeed':4
         }
 
 class EventState(Enumerated):
@@ -977,6 +1175,81 @@ class LifeSafetyState(Enumerated):
         , 'testSupervisory':23
         }
 
+class LiftCarDirection(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'none':0
+        , 'stopped':1
+        , 'up':2
+        , 'down':3
+        , 'upAndDown':4
+        }
+
+class LiftCarDoorCommand(Enumerated):
+    enumerations = \
+        { 'none':0
+        , 'open':1
+        , 'close':2
+        }
+        
+class LiftCarDriveStatus(Enumerated):
+    enumerations = \
+        { 'stationary':0
+        , 'braking':1
+        , 'accelerate':2
+        , 'decelerate':3
+        , 'ratedSpeed':4
+        , 'singleFloorJump':5
+        , 'twoFloorJump':6
+        , 'threeFloorJump':7
+        , 'multiFloorJump':8
+        , 'unknown':8
+        }
+
+class LiftCarMode(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'normal':0 
+        , 'vip':1
+        , 'homing':2
+        , 'parking':3
+        , 'attendantControl':4
+        , 'firefighterControl':5
+        , 'outOfService':6
+        }
+
+class LiftFault(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'controllerFault':0
+        , 'driveAndMotorFault':1
+        , 'governorAndSafetyGearFault':2
+        , 'liftShaftDeviceFault':3
+        , 'powerSupplyFault':4
+        , 'safetyInterlockFault':5
+        , 'doorClosingFault':6
+        , 'doorOpeningFault':7
+        , 'carStoppedOutsideLandingZone':8
+        , 'callButtonStuck':9
+        , 'startFailure':10
+        , 'controllerSupplyFault':11
+        , 'selfTestFailure':12
+        , 'runtimeLimitExceeded':13
+        , 'positionLost':14
+        , 'driveTemperatureexceeded':15
+        , 'loadMeasurementFault':16
+        }
+
+class LiftGroupMode(Enumerated):
+    enumerations = \
+        { 'normal': 0
+        , 'downPeak':1
+        , 'twoWay':2
+        , 'fourWay':3
+        , 'emergencyPower':4
+        , 'upPeak':5
+        }
+
 class LightingInProgress(Enumerated):
     enumerations = \
         { 'idle':0
@@ -1035,6 +1308,87 @@ class Maintenance(Enumerated):
         , 'needServiceInoperative':3
         }
 
+<<<<<<< HEAD
+=======
+class MembershipRegistration(Enumerated):
+    enumerations = \
+        { 'configured':0
+        , 'registred':1
+        , 'listen':2
+        }
+
+class MembershipStatus(Enumerated):
+    enumerations = \
+        { 'unknown':0
+        , 'invalid':1
+        , 'configured':2
+        , 'pending':3
+        , 'registered':4
+        , 'learned':5
+        , 'listening':6
+        , 'expired':7
+        }
+
+class NetworkNumberQuality(Enumerated):
+    enumerations = \
+        { 'unknown', 0
+        , 'learned', 1
+        , 'learnedConfigured', 2
+        , 'configured', 3
+        }
+
+class NetworkPortCommand(Enumerated):
+    vendor_range = (128, 255)
+    enumerations = \
+        { 'idle':0
+        , 'discardChanges':1
+        , 'renewFdRegistration':2
+        , 'restartSlaveDiscovery':3
+        , 'renewDHCP':4
+        , 'restartAutonegotiation':5
+        , 'disconnect':6
+        , 'restartPort':7
+        }
+
+class NetworkPriority(Enumerated):
+    enumerations = \
+        { 'normal':0
+        , 'urgent':1
+        , 'criticalEquipment':2
+        , 'lifeSafety':3
+        }
+
+class NetworkType(Enumerated):
+    vendor_range =(64, 255)
+    enumerations = \
+        { 'ethernet':0
+        , 'arcnet':1
+        , 'mstp':2
+        , 'ptp':3
+        , 'lontalk':4
+        , 'bacnetIPv4':5
+        , 'zigbee':6
+        , 'virtual':7
+        , 'nonBacnet':8 # removed in version 1 revision 18
+        , 'ipv6':9
+        , 'serial':10
+        , 'bvrl':n  # most likely 11 but in the addenda it's marked "n"
+        , 'websockets':n # same as above
+        , 'dnsSd':n # again
+        }
+
+class NLRejectReason(Enumerated):
+    enumerations = \
+        { 'other':0
+        , 'routerNotFound':1
+        , 'routerBusy':2
+        , 'unknownNlMessage':3
+        , 'messageTooLong':4
+        , 'securityError':5
+        , 'addressingError':6
+        }
+
+>>>>>>> stage
 class NodeType(Enumerated):
     enumerations = \
         { 'unknown':0
@@ -1049,6 +1403,16 @@ class NodeType(Enumerated):
         , 'property':9
         , 'functional':10
         , 'other':11
+        , 'subsystem':12
+        , 'building':13
+        , 'floor':14
+        , 'section':15
+        , 'module':16
+        , 'tree':17
+        , 'member':18
+        , 'protocol':19
+        , 'room':20
+        , 'zone':21
         }
 
 class NotifyType(Enumerated):
@@ -1115,6 +1479,7 @@ class PropertyIdentifier(Enumerated):
         , 'actionText':3
         , 'activationTime':254
         , 'activeAuthenticationPolicy':255
+        , 'activeCovMultipleSubscrptions':481 
         , 'activeCovSubscriptions':152
         , 'activeText':4
         , 'activeVtSessions':5
@@ -1131,6 +1496,7 @@ class PropertyIdentifier(Enumerated):
         , 'applicationSoftwareVersion':12
         , 'archive':13
         , 'assignedAccessRights':256
+        , 'assignedLandingCalls':447
         , 'attemptedSamples':124
         , 'authenticationFactors':257
         , 'authenticationPolicyList':258
@@ -1143,18 +1509,57 @@ class PropertyIdentifier(Enumerated):
         , 'backupAndRestoreState':338
         , 'backupFailureTimeout':153
         , 'backupPreparationTime':339
+<<<<<<< HEAD
         , 'baseDeviceSecurityPolicy':327
+=======
+        , 'bacnetIpAddress':400
+        , 'bacnetIpDefaultGateway':401
+        , 'bacnetIpDhcpEnable':402
+        , 'bacnetIpDhcpLeaseTime':403
+        , 'bacnetIpDhcpLeaseTimeRemaining':404
+        , 'bacnetIpDhcpServer':405
+        , 'bacnetIpDnsServer':406
+        , 'bacnetIpGlobalAddress':407
+        , 'bacnetIpMode':408
+        , 'bacnetIpMulticastAddress':409
+        , 'bacnetIpNatTraversal':410
+        , 'bacnetIpSubnetMask':411
+        , 'bacnetIpUdpPort':412
+        , 'bacnetNlAddress':n # Enum missing
+        , 'baseDeviceSecurityPolicy':327
+        , 'bbmdAcceptFdRegistrations':413
+        , 'bbmdBroadcastDistributionTable':414
+        , 'bbmdForeignDeviceTable':415
+        , 'bdsDnsServers':n # Enum missing
+>>>>>>> stage
         , 'belongsTo':262
         , 'bias':14
         , 'bitMask':342
         , 'bitText':343
         , 'blinkWarnEnable':373
+        , 'browsingDomains':n # Enum missing
         , 'bufferSize':126
+        , 'bvrlConnectionStatus':n # Enum missing
+        , 'bvrlPeerDevice':n # Enum missing
+        , 'bvrlPeerUri':n # Enum missing
+        , 'caCertificates':n # Enum missing
+        , 'carAssignedDirection':448
+        , 'carDoorCommand':449
+        , 'carDoorStatus':450
+        , 'carDoorText':451
+        , 'carDoorZone':452
+        , 'carDriveStatus':453
+        , 'carLoad':454
+        , 'carLoadUnits':455
+        , 'carMode':456
+        , 'carMovingDirection':457
+        , 'carPosition':458
         , 'changeOfStateCount':15
         , 'changeOfStateTime':16
         , 'channelNumber':366
         , 'clientCovIncrement':127
         , 'configurationFiles':154
+        , 'connectionIdleTimeout':n # Enum missing
         , 'controlGroups':367
         , 'controlledVariableReference':19
         , 'controlledVariableUnits':20
@@ -1171,12 +1576,19 @@ class PropertyIdentifier(Enumerated):
         , 'credentialStatus':264
         , 'credentials':265
         , 'credentialsInZone':266
+        , 'currentWebsockets':n # Enum missing
         , 'databaseRevision':155
         , 'dateList':23
         , 'daylightSavingsStatus':24
         , 'daysRemaining':267
         , 'deadband':25
+        , 'defaultBrowsingDomain':n # Enum missing
+        , 'defaultCaCertificates':n # Enum missing
         , 'defaultFadeTime':374
+        , 'defaultForwards':n # Enum missing
+        , 'defaultPortCertificate':n # Enum missing
+        , 'defaultPortPrivateKey':n # Enum missing
+        , 'defaultTimeToLive':n # Enum missing
         , 'defaultRampRate':375
         , 'defaultStepIncrement':376
         , 'derivativeConstant':26
@@ -1184,9 +1596,15 @@ class PropertyIdentifier(Enumerated):
         , 'description':28
         , 'descriptionOfHalt':29
         , 'deviceAddressBinding':30
+        , 'deviceGroup': n    # enum absent from the addenda 2016bj
+        , 'deviceroxyMode':n # Enum missing
         , 'deviceType':31
+        , 'directory':n    # enum absent from addenda 2016bj
+        , 'directoryscope':n # Enum missing
+        , 'directoryServerStatus':n # Enum missing
         , 'directReading':156
         , 'distributionKeyRevision':328
+        , 'dnsSdMode':n # Enum missing
         , 'doNotHide':329
         , 'doorAlarmState':226
         , 'doorExtendedPulseTime':227
@@ -1200,9 +1618,15 @@ class PropertyIdentifier(Enumerated):
         , 'egressActive':386
         , 'egressTime':377
         , 'elapsedActiveTime':33
+        , 'elevatorGroup':459
+        , 'energyMeter':460
+        , 'energyMeterRef':461
+        , 'entityclass':n # Enum missing
+        , 'entityList':n # Enum missing
         , 'entryPoints':268
         , 'enable':133
         , 'errorLimit':34
+        , 'escalatorMode':462
         , 'eventAlgorithmInhibit':354
         , 'eventAlgorithmInhibitRef':355
         , 'eventDetectionEnable':353
@@ -1223,6 +1647,7 @@ class PropertyIdentifier(Enumerated):
         , 'failedAttempts':273
         , 'failedAttemptsTime':274
         , 'faultParameters':358
+        , 'faultSignals':463
         , 'faultType':359
         , 'faultValues':39
         , 'feedbackValue':40
@@ -1230,15 +1655,21 @@ class PropertyIdentifier(Enumerated):
         , 'fileSize':42
         , 'fileType':43
         , 'firmwareRevision':44
+        , 'floorText':464
         , 'fullDutyBaseline':215
         , 'globalIdentifier':323
+        , 'groupId':465
         , 'groupMembers':345
         , 'groupMemberNames':346
+        , 'groupMode':467
         , 'highLimit':45
+        , 'higherDeck':468
+        , 'inDirectory':n # Enum missing
         , 'inactiveText':46
         , 'inProcess':47
         , 'inProgress':378
         , 'inputReference':181
+        , 'installationId':469
         , 'instanceOf':48
         , 'instantaneousPower':379
         , 'integralConstant':49
@@ -1246,6 +1677,9 @@ class PropertyIdentifier(Enumerated):
         , 'intervalOffset':195
         , 'isUtc':344
         , 'keySets':330
+        , 'landingCalls':470
+        , 'landingCallControl':471
+        , 'landingDoorStatus':472
         , 'lastAccessEvent':275
         , 'lastAccessPoint':276
         , 'lastCredentialAdded':277
@@ -1280,7 +1714,14 @@ class PropertyIdentifier(Enumerated):
         , 'loggingRecord':184
         , 'loggingType':197
         , 'lowLimit':59
+<<<<<<< HEAD
+=======
+        , 'lowerDeck':473
+        , 'machineRoomId':474
+        , 'macAddress':423
+>>>>>>> stage
         , 'maintenanceRequired':158
+        , 'makingCarCall':475
         , 'manipulatedVariableReference':60
         , 'manualSlaveAddressBinding':170
         , 'maskedAlarmValues':234
@@ -1295,6 +1736,7 @@ class PropertyIdentifier(Enumerated):
         , 'maxMaster':64
         , 'maxPresValue':65
         , 'maxSegmentsAccepted':167
+        , 'mdnsMulticastAddress':n # Enum missing
         , 'memberOf':159
         , 'memberStatusFlags':347
         , 'members':286
@@ -1311,6 +1753,14 @@ class PropertyIdentifier(Enumerated):
         , 'musterPoint':287
         , 'negativeAccessRules':288
         , 'networkAccessSecurityPolicies':332
+<<<<<<< HEAD
+=======
+        , 'nextStoppingFloor':476
+        , 'networkInterfaceName':424
+        , 'networkNumber':425
+        , 'networkNumberQuality':426
+        , 'networkType':427
+>>>>>>> stage
         , 'nodeSubtype':207
         , 'nodeType':208
         , 'notificationClass':17
@@ -1333,6 +1783,7 @@ class PropertyIdentifier(Enumerated):
         , 'occupancyState':296
         , 'occupancyUpperLimit':297
         , 'occupancyUpperLimitEnforced':298
+        , 'operationDirection':477
         , 'operationExpected':161
         , 'optional':80
         , 'outOfService':81
@@ -1341,10 +1792,17 @@ class PropertyIdentifier(Enumerated):
         , 'passbackExemption':299
         , 'passbackMode':300
         , 'passbackTimeout':301
+        , 'passengerAlarm':478
+        , 'passengerPushbuttonAlarm':n #enum missing
         , 'polarity':84
+        , 'portCertificate':n # Enum missing
+        , 'portCertificateSigningParameters':n # Enum missing
+        , 'portCertificateToSign':n # Enum missing
+        , 'portPrivateKey':n # Enum missing
         , 'portFilter':363
         , 'positiveAccessRules':302
         , 'power':384
+        , 'powerMode':479
         , 'prescale':185
         , 'presentValue':85
         , 'priority':86
@@ -1363,6 +1821,8 @@ class PropertyIdentifier(Enumerated):
         , 'protocolRevision':139
         , 'protocolServicesSupported':97
         , 'protocolVersion':98
+        , 'proxiedNlDevices':n # Enum missing
+        , 'proxiedNlDeviceGroups':n # Enum missing
         , 'pulseRate':186
         , 'readOnly':99
         , 'reasonForDisable':303
@@ -1370,6 +1830,7 @@ class PropertyIdentifier(Enumerated):
         , 'recipientList':102
         , 'recordsSinceNotification':140
         , 'recordCount':141
+        , 'registeredCarCall':480
         , 'reliability':103
         , 'reliabilityEvaluationInhibit':357
         , 'relinquishDefault':104
@@ -1420,6 +1881,7 @@ class PropertyIdentifier(Enumerated):
         , 'timeOfStateCountReset':115
         , 'timeSynchronizationInterval':204
         , 'timeSynchronizationRecipients':116
+        , 'totalAsduLengthAccepted':n # Enum missing
         , 'totalRecordCount':145
         , 'traceFlag':308
         , 'trackingValue':164
@@ -1455,6 +1917,41 @@ class PropertyIdentifier(Enumerated):
         , 'zoneTo':321
         }
 
+class Relationship(Enumerated):
+    vendor_range = (1024, 65535)
+    enumerations = \
+        { 'unknown':0
+        , 'default':1
+        , 'contains':2
+        , 'containedBy':3
+        , 'uses':4
+        , 'usedBy':5
+        , 'commands':6
+        , 'commandedBy':7
+        , 'adjusts':8
+        , 'adjustedBy':9
+        , 'ingress':10
+        , 'egress':11
+        , 'suppliesAir':12
+        , 'receivesAir':13
+        , 'suppliesHotAir':14
+        , 'receivesHotAir':15
+        , 'suppliesCoolAir':16
+        , 'receivesCoolAir':17
+        , 'suppliesPower':18
+        , 'receivesPower':19
+        , 'suppliesGas':20
+        , 'receivesGas':21
+        , 'suppliesWater':22
+        , 'receivesWater':23
+        , 'suppliesHotWater':24
+        , 'receivesHotWater':25
+        , 'suppliesCoolWater':26
+        , 'receivesCoolWater':27
+        , 'suppliesSteam':28
+        , 'receivesSteam':29
+        }
+
 class Reliability(Enumerated):
     vendor_range = (64, 65535)
     enumerations = \
@@ -1471,6 +1968,19 @@ class Reliability(Enumerated):
         , 'configurationError':10
         , 'communicationFailure':12
         , 'numberFault':13
+<<<<<<< HEAD
+=======
+        , 'monitoredObjectFault':14
+        , 'tripped':15
+        , 'faultsListed':23
+        , 'activationFailure':17
+        , 'renewDhcpFailure':18
+        , 'renewFdRegistrationFailure':19
+        , 'restartAutoNegotiationFailure':20
+        , 'restartFailure':21
+        , 'propertyCommandFailure':22
+        , 'faultsListed': 23
+>>>>>>> stage
         }
 
 class RestartReason(Enumerated):
@@ -1527,6 +2037,13 @@ class SilencedState(Enumerated):
         , 'audibleSilenced':1
         , 'visibleSilenced':2
         , 'allSilenced':3
+        }
+
+class SuccessFilter(Enumerated):
+    enumerations = \
+        { 'all':0
+        , 'successesOnly':1
+        , 'failuresOnly':2
         }
 
 class VTClass(Enumerated):
@@ -1646,6 +2163,22 @@ class PropertyStates(Choice):
         , Element('lightingInProgress', LightingInProgress, 38)
         , Element('lightingOperation', LightingOperation, 39)
         , Element('lightingTransition', LightingTransition, 40)
+<<<<<<< HEAD
+=======
+        , Element('bacnetIpMode', IpMode, 45)
+        , Element('networkPortCommand', NetworkPortCommand, 46)
+        , Element('networkType', NetworkType, 47)
+        , Element('networkNumberQuality', NumberQuality, 48)
+        , Element('escalatorOperationDirection', EscalatorOperationDirection, 49)
+        , Element('escalatorFault', EscalatorFault, 50)
+        , Element('escalatorMode', EscalatorMode, 51) 
+        , Element('liftCarDirection', LiftCarDirection, 52)
+        , Element('liftCarDoorCommand', LiftCarDoorCommand, 53)
+        , Element('liftCarDrivestatus', LiftCarDriveStatus, 54)
+        , Element('liftCarMode', LiftCarMode, 55)
+        , Element('liftGroupMode', LiftGroupMode, 56)
+        , Element('liftFault', LiftFault, 57)
+>>>>>>> stage
         ]
 
 class PropertyValue(Sequence):
@@ -1744,6 +2277,100 @@ class AssignedAccessRights(Sequence):
         , Element('enable', Boolean, 1)
         ]
 
+<<<<<<< HEAD
+=======
+class AssignedLandingCalls(Sequence):
+    sequenceElements = \
+        [ Element('landingCalls', LandingCalls, 0)
+        ]
+
+class AuditNotification(Sequence):
+    sequenceElements = \
+        [ Element('sourceTimeStamp', TimeStamp, True)
+        , Element('targetTimeStamp', TimeStamp, True)
+        , Element('sourceDevice', Recipient)
+        , Element('sourceObject', ObjectIdentifier, True)
+        , Element('operation', AuditOperation)
+        , Element('sourceComment', CharacterString, True)
+        , Element('targetComment', CharacterString, True)
+        , Element('invokeId', Unsigned, True)
+        , Element('sourceUserId', Unsigned, True)
+        , Element('sourceUserRole', Unsigned, True)
+        , Element('targetDevice', Recipient)
+        , Element('targetObject', ObjectIdentifier)
+        , Element('targetProperty', PropertyReference, True)
+        , Element('targetPriority', Unsigned, True)
+        , Element('targetValue', Any, True)
+        , Element('currentValue', Any, True)
+        , Element('result', Error, True)
+        ]
+
+class AuditLogRecordLogDatum(Choice):
+    choiceElements = \
+        [ Element('logStatus', LogStatus, 0)
+        , Element('auditNotification', AuditNotification, 1)
+        , Element('timeChange', Real, 2)
+        ]
+
+class AuditLogRecord(Sequence):
+    sequenceElements = \
+        [ Element('timeStamp', DateTime, 0)
+        , Element('logDatum', AuditLogRecordLogDatum, 1)
+        ]
+
+class AuditLogRecordResult(Sequence):
+    sequenceElements = \
+        [ Element('sequenceNumber', Unsigned, 0)
+        , Element('logRecord', AuditLogRecord)
+        ]
+
+class AuditLogQueryParametersByTarget(Sequence):
+    sequenceElements = \
+        [ Element('targetDeviceIdentifier', ObjectIdentifier, 0)
+        , Element('targetDeviceAddress', Address, 1, True)
+        , Element('targetObjectIdentifier', ObjectIdentifier, 2, True)
+        , Element('targetPropertyIdentifier', PropertyIdentifier, 3, True)
+        , Element('targetArrayIndex', Unsigned, 4, True)
+        , Element('targetPriority', Unsigned, 5, True)
+        , Element('operations', AuditOperationFlags, 6, True)
+        , Element('successfulActionsOnly', Boolean, 7)
+        ]
+
+class AuditLogQueryParametersBySource(Sequence):
+    sequenceElements = \
+        [ Element('sourceDeviceIdentifier', ObjectIdentifier, 0)
+        , Element('sourceDeviceAddress', Address, 1, True)
+        , Element('sourceObjectIdentifier', ObjectIdentifier, 2, True)
+        , Element('operations', AuditOperationFlags, 3, True)
+        , Element('successfulActionsOnly', Boolean, 4, True)
+        ]
+
+class AuditLogQueryParameters(Choice):
+    choiceElements = \
+        [ Element('byTarget', AuditLogQueryParametersByTarget, 0)
+        , Element('bySource', AuditLogQueryParametersBySource, 1)
+        ]
+        
+class AuthenticationDataUser(Sequence):
+    sequenceElements = \
+        [ Element('userIdentifier', Unsigned, 0)
+        , Element('userRole', Unsigned, 1)
+        ]
+
+class AuthenticationDataVendorSpecific(Sequence):
+    sequenceElements = \
+        [ Element('vendorIdentifier', Unsigned, 0)
+        , Element('authenticationMechanism', Unsigned, 1)
+        , Element('authenticationData', OctetString, 2)
+        ]
+
+class AuthenticationData(Choice):
+    choiceElements = \
+        [ Element('user', AuthenticationDataUser, 0)
+        , Element('vendorSpecific', AuthenticationDataVendorSpecific, 200)
+        ]
+
+>>>>>>> stage
 class AuthenticationFactor(Sequence):
     sequenceElements = \
         [ Element('formatType', AuthenticationFactorType, 0)
@@ -1778,6 +2405,20 @@ class CalendarEntry(Choice):
         , Element('weekNDay', WeekNDay, 2)
         ]
 
+<<<<<<< HEAD
+=======
+class CertificateSigninParameters(Sequence):
+    sequenceElements = \
+        [ Element('commonName', CharacterString, 0)
+        , Element('countryName', CharacterString, 1)
+        , Element('stateOrProvinceName', CharacterString)
+        , Element('localityName', CharacterString, 3)
+        , Element('organizationName', CharacterString, 4)
+        , Element('emailAddress', CharacterString, 5)
+        , Element('alternativeNames', CharacterString, 6, True)
+        ]
+
+>>>>>>> stage
 class ChannelValue(Choice):
     choiceElements = [
         ### needs help
@@ -1789,6 +2430,24 @@ class ClientCOV(Choice):
         , Element('defaultIncrement', Null)
         ]
 
+<<<<<<< HEAD
+=======
+class ConnectionPeer(Sequence):
+    sequenceElements = \
+        [ Element('accept', Null, 0)
+        , Element('url', CharacterString, 1)
+        , Element('device', ObjectIdentifier, 2)
+        ]
+
+class ConfirmedServiceRequest(Choice):
+        # Absent from the addendas 2012ai and 2016bj 
+        pass
+
+class ConfirmedServiceACK(Choice):
+        # Absent from the addendas 2012ai and 2016bj
+        pass
+
+>>>>>>> stage
 class COVSubscription(Sequence):
     sequenceElements = \
         [ Element('recipient', RecipientProcess, 0)
@@ -1796,6 +2455,28 @@ class COVSubscription(Sequence):
         , Element('issueConfirmedNotifications', Boolean, 2)
         , Element('timeRemaining', Unsigned, 3)
         , Element('covIncrement', Real, 4, True)
+        ]
+
+class ListOfCOVReferences(Sequence):
+    sequenceElements = \
+        [ Element('propertyReference', PropertyReference, 0)
+        , Element('covIncrement', Real, 1)
+        , Element('timeStamped', Boolean, 2)
+        ]
+
+class ListOfCOVSubscriptionSpecifications(Sequence):
+    sequenceElements = \
+        [ Element('monitoredObject', ObjectIdentifier, 0)
+        , Element('listOfCOVReferences', ListOfCOVReferences, 1)
+        ]
+
+class COVSubscriptionMultiple(Sequence):
+    sequenceElements = \
+        [ Element('recipient', RecipientProcess, 0)
+        , Element('issueConfirmedNotifications', Boolean, 1)
+        , Element('timeRemaining', Unsigned, 2)
+        , Element('maxNotificationDelay', Unsigned, 3)
+        , Element('listOfCOVSubscriptionSpecifications', ListOfCOVSubscriptionSpecifications, 4)
         ]
 
 class CredentialAuthenticationFactor(Sequence):
@@ -1820,6 +2501,25 @@ class Destination(Sequence):
         , Element('transitions', EventTransitionBits)
         ]
 
+<<<<<<< HEAD
+=======
+class DeviceGroupMember(Sequence):
+    sequenceElements = \
+        [ Element('memeber', EID, 0)
+        , Element('timeToLive', Unsigned, 1)
+        , Element('status', MembershipStatus, 2)
+        , Element('fault', ForwardingFault, 3)
+        ]
+
+class DeviceGroupMembership(Sequence):
+    sequenceElements = \
+        [ Element('deviceGroup', EID)
+        , Element('timeToLive', Unsigned)
+        , Element('status', MembershipStatus)
+        , Element('faul', ForwardingFault)
+        ]
+
+>>>>>>> stage
 class DeviceObjectPropertyValue(Sequence):
     sequenceElements = \
         [ Element('deviceIdentifier', ObjectIdentifier, 0)
@@ -2055,6 +2755,36 @@ class KeyIdentifier(Sequence):
         , Element('keyId', Unsigned, 1)
         ]
 
+class LandingCalls(Sequence):
+    sequenceElements = \
+        [ Element('floorNumber', Unsigned, 0)
+        , Element('direction', LiftCarDirection, 1)
+        ]
+
+class LandingCallStatusCommand(Choice):
+    choiceElements = \
+        [ Element('direction', LiftCarDirection, 1)
+        , Element('destination', Unsigned, 2)
+        ]
+
+class LandingCallStatus(Sequence):
+    sequenceElements = \
+        [ Element('floorNumber', Unsigned, 0)
+        , Element('command', LandingCallStatusCommand)
+        , Element('floorText', CharacterString, 3, True)
+        ]
+
+class LandingDoors(Sequence):
+    sequenceElements = \
+        [ Element('floorNumber', Unsigned, 0)
+        , Element('doorStatus', DoorStatus, 1)
+        ]
+
+class LandingDoorStatus(Sequence):
+    sequenceElements = \
+        [ Element('landingDoors'), SequenceOf(LandingDoors), 0
+        ]
+
 class LightingCommand(Sequence):
     sequenceElements = \
         [ Element('operation', LightingOperation, 0)
@@ -2063,6 +2793,17 @@ class LightingCommand(Sequence):
         , Element('stepIncrement', Real, 3) ### optional
         , Element('fadeTime', Unsigned, 4) ### optional
         , Element('priority', Unsigned, 5) ### optional
+        ]
+
+class LiftCarCallList(Sequence):
+    sequenceElements = \
+        [ Element('floorNumbers', SequenceOf(Unsigned), 0)
+        ]
+
+class LifeSafetyOperationInfo(Sequence):
+    sequenceElements = \
+        [ Element('requistingProcessIdentifier', Unsigned, 0)
+        , Element('request', SequenceOf(LifeSafetyOperation), 1)
         ]
 
 class LogDataLogData(Choice):
@@ -2290,6 +3031,38 @@ class ObjectPropertyValue(Sequence):
         , Element('priority', Unsigned, 4, True)
         ]
 
+<<<<<<< HEAD
+=======
+class ObjectRecord(Sequence):
+    sequenceElements = \
+        [ Element('device', EID, 0)
+        , Element('objectIdentifier', ObjectIdentifier, 1)
+        , Element('objectName', CharacterString, 2)
+        , Element('priority', Unsigned, 3)
+        , Element('timeToLive', Unsigned, 4)
+        , Element('quality', DirectoryRecordQuality, 5)
+        ]
+
+class ObjectSelector(Choice):
+    choiceElements = \
+        [ Element('none', Null)
+        , Element('object', ObjectIdentifier)
+        , Element('objectType',ObjectType)
+        ]
+
+class OptionalPriorityFilter(Choice):
+    choiceElements = \
+        [ Element('default', Null)
+        , Element('filter', PriorityFilter)
+        ]
+
+class OptionalAddress(Choice):
+    choiceElements = \
+        [ Element('null', Null)
+        , Element('address', Address)
+        ]
+
+>>>>>>> stage
 class OptionalCharacterString(Choice):
     choiceElements = \
         [ Element('null', Null)
@@ -2351,6 +3124,27 @@ class PropertyReference(Sequence):
         , Element('propertyArrayIndex', Unsigned, 1, True)
         ]
 
+class ReferenceObject(Sequence):
+    sequenceElements = \
+        [ Element('deviceIdentifier', ObjectIdentifier, 0, True)
+        , Element('objectIdentifier', ObjectIdentifier, 1)
+        ]
+
+class ReferenceProperty(Sequence):
+    sequenceElements = \
+        [ Element('deviceIdentifier', ObjectIdentifier, 0, True)
+        , Element('objectIdentifier', ObjectIdentifier, 1, True)
+        , Element('propertyIdentifier', PropertyIdentifier, 2)
+        , Element('propertyArrayIndex', Unsigned, 3, True)
+        ]
+
+class Reference(Choice):
+    choiceElements = \
+        [ Element('object', ReferenceObject)
+        , Element('property', ReferenceProperty, 2)
+        , Element('uri', CharacterString, 3)
+        ]
+
 class Scale(Choice):
     choiceElements = \
         [ Element('floatScale', Real)
@@ -2365,6 +3159,16 @@ class SecurityKeySet(Sequence):
         , Element('keyIds', SequenceOf(KeyIdentifier), 3)
         ]
 
+<<<<<<< HEAD
+=======
+class SecurityParameters(Sequence):
+    sequenceElements = \
+        [ Element('keyRevision', Unsigned, 0)
+        , Element('keyNumber', Unsigned, 1)
+        , Element('authentication', AuthenticationData, 2, True)
+        ]
+
+>>>>>>> stage
 class ShedLevel(Choice):
     choiceElements = \
         [ Element('percent', Unsigned, 0)
@@ -2390,6 +3194,63 @@ class SpecialEvent(Sequence):
         , Element('eventPriority', Unsigned, 3)
         ]
 
+<<<<<<< HEAD
+=======
+class TransportError(Sequence):
+    sequenceElements = \
+        [ Element('transportError', Error, 0)
+        , Element('sequenceNumber', Unsigned, 1, True)
+        , Element('nativeCode', Integer, 2, True)
+        , Element('errorText', CharacterString, 3, True)
+        ]
+
+class TransportPDUHeader(Sequence):
+    sequenceElements = \
+        [ Element('version', Unsigned, 0)
+        , Element('priority', NetworkPriority, 1, True)
+        , Element('sequenceNumber', Unsigned, 2, True)
+        , Element('sourceEid', EID, 3)
+        , Element('destinationEid', EID, 4)
+        , Element('originalDestinationEid', EID, 5, True) 
+        , Element('invokeId', Unsigned, 6, True) 
+        , Element('forwards', Unsigned, 7, True) 
+        , Element('security', SecurityParameters, 8, True) 
+        ]
+
+class TransportPDUBody(Choice):
+    choiceElements = \
+        [ Element('transportError', TransportError, 0)
+        , Element('npdu', OctetString, 1)
+        , Element('confirmedrequest', ConfirmedServiceRequest, 2)
+        , Element('unconfirmedRequest', UnconfirmedServiceRequest, 3)
+        , Element('complexAck', ConfirmedServiceAck, 4)
+        , Element('simpleAck', ConfirmedServiceChoice, 5)
+        , Element('error', ErrorPDU, 6)
+        , Element('abort', Abort, 7)
+        , Element('reject', RejectReason, 8)
+        ]
+
+class TransportPDU(Sequence):
+    sequenceElements = \
+        [ Element('header', TransportPDUHeader, 0)
+        , Element('body', TransportPDUBody, 1)
+        ]
+
+class UnconfirmedServiceRequest(Choice):
+        # absent from the 2012ai and 2016bj addendas
+        pass
+
+class UnconfirmedServiceACK(Choice):
+        # absent from the 2012ai and 2016bj addendas
+        pass
+
+class VMACEntry(Sequence):
+    sequenceElements = \
+        [ Element('virtualMacAddress', OctetString, 0)
+        , Element('nativeMacAddress', OctetString, 1)
+        ]
+
+>>>>>>> stage
 class VTSession(Sequence):
     sequenceElements = \
         [ Element('localVtSessionID', Unsigned)
