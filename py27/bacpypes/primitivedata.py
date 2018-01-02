@@ -1554,7 +1554,7 @@ class ObjectType(Enumerated):
         , 'largeAnalogValue':46
         , 'lifeSafetyPoint':21
         , 'lifeSafetyZone':22
-        , 'lift':59 # enum missing
+        , 'lift':59
         , 'loadControl':28
         , 'loop':12
         , 'multiStateInput':13

@@ -1406,7 +1406,7 @@ class ListOfCOVSubscriptionSpecifications(Sequence):
         ]
 
 class SubscribeCOVPropertyMultipleRequest(ConfirmedRequestSequence):
-    serviceChoice = n # enum missing
+    serviceChoice = 30 
     sequenceElements = \
         [ Element('subscriberProcessIdentifier', Unsigned, 0)
         , Element('issueConfirmedNotifications', Boolean, 1)
@@ -1789,8 +1789,8 @@ class ConfirmedServiceChoice(Enumerated):
         'subscribeCOV':5,
         'subscribeCOVProperty':28,
         'lifeSafetyOperation':27,
-        'subscribeCOVPropertyMultiple':n, # enum missing from the addenda
-        'confirmedCOVNotificationMultiple':n+1, # enum missing from the addenda
+        'subscribeCOVPropertyMultiple':30,
+        'confirmedCOVNotificationMultiple':31, 
         'confirmedAuditNotification':n, # enum missing from the addenda
 
     # File Access Services
@@ -1837,7 +1837,7 @@ class UnconfirmedServiceChoice(Enumerated):
         'whoIs':8,
         'utcTimeSynchronization':9,
         'writeGroup':10,
-        'unconfirmedCOVNotificationMultiple':n, # Enum absent from the addenda
+        'unconfirmedCOVNotificationMultiple':11
         }
 
 expand_enumerations(UnconfirmedServiceChoice)

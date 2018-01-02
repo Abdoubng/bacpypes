@@ -215,6 +215,9 @@ class ServicesSupported(BitString):
         , 'subscribeCOVProperty':38
         , 'getEventInformation':39
         , 'writeGroup':40
+        , 'subscribeCOVPropertyMultiple':41
+        , 'confirmedCOVNotificationMultiple':42
+        , 'unconfirmedCOVNotificationMultiple':43
         }
     bitLen = 41
 
@@ -2065,6 +2068,7 @@ class Reliability(Enumerated):
         , 'restartAutoNegotiationFailure':20
         , 'restartFailure':21
         , 'propertyCommandFailure':22
+        , 'faultsListed': 23
         }
 
 class RestartReason(Enumerated):
@@ -2923,6 +2927,12 @@ class LightingCommand(Sequence):
 class LiftCarCallList(Sequence):
     sequenceElements = \
         [ Element('floorNumbers', SequenceOf(Unsigned), 0)
+        ]
+
+class LifeSafetyOperationInfo(Sequence):
+    sequenceElements = \
+        [ Element('requistingProcessIdentifier', Unsigned, 0)
+        , Element('request', SequenceOf(LifeSafetyOperation), 1)
         ]
 
 class LogDataLogData(Choice):
